@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './LoginForm.css';
 import { useState, useEffect } from 'react';
-export default function LoginForm() {
-    const [loginTextClass, setLoginTextClass] = useState('login-text slide-from-above');
-    const [usernameClass, setUsernameClass] = useState('login-input slide-from-right');
-    const [passwordClass, setPasswordClass] = useState('login-input slide-from-left');
-    const [buttonClass, setButtonClass] = useState('login-btn slide-from-below');
+export default function LoginForm({ inPage = false }) {
+    const [loginTextClass, setLoginTextClass] = useState(`login-text ${!inPage ? 'slide-from-above' : 'invisible'}`);
+    const [usernameClass, setUsernameClass] = useState(`login-input ${!inPage ? 'slide-from-right' : 'invisible'}`);
+    const [passwordClass, setPasswordClass] = useState(`login-input ${!inPage ? 'slide-from-left' : 'invisible'}`);
+    const [buttonClass, setButtonClass] = useState(`login-btn ${!inPage ? 'slide-from-below' : 'invisible'}`);
     const [signupClass, setSignupClass] = useState('signup-msg invisible');
     const [containerClass, setContainerClass] = useState('flex-container-intro');
     const [error, setError] = useState('');
@@ -47,20 +47,19 @@ export default function LoginForm() {
             }, delay);
             timeouts.push(id);
         }
-        changeLoginTextClass('login-text', 0);
-        changeUsernameClass('login-input', 0);
-        changePasswordClass('login-input', 0);
-        changeButtonClass('login-btn', 0);
-        changeSignupClass('signup-msg', 1500);
+        changeLoginTextClass('login-text', 10);
+        changeUsernameClass('login-input', 10);
+        changePasswordClass('login-input', 10);
+        changeButtonClass('login-btn', 10);
+        changeSignupClass('signup-msg', inPage ? 10 : 1500);
 
         /** Check for error message on the URL */
-
 
         return (() => timeouts.forEach(timeout => clearTimeout(timeout)));
     }, []);
 
     const transitionOut = (callback) => {
-        setContainerClass('container-class-intro invisible');
+        setContainerClass('flex-container-intro invisible');
         setTimeout(callback, 1000);
     }
 

@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import SignupComponent from '../../components/SignupComponent/SignupComponent';
 export default function AuthPage(){
     const [showLoginPage, setShowLoginPage] = useState(true);
+    const [slidingTransition, setSlidingTransition] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
     const {jwt, hasPublicKey} = useAuth();
@@ -22,14 +23,18 @@ export default function AuthPage(){
             }
         }
     },[navigate,jwt,hasPublicKey,location]);
+
+    const setInPage = (val) =>{
+        setSlidingTransition(!val);
+    }
     
     return (
         <main>
             {
                 showLoginPage ? 
-                <LoginForm />
+                <LoginForm inPage={!slidingTransition} />
                 :
-                <SignupComponent />
+                <SignupComponent setInPage={setInPage} />
             }
         </main>
     );

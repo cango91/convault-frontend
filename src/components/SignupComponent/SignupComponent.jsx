@@ -1,5 +1,9 @@
-export default function SignupComponent(){
+import SignupForm from "../SignupForm/SignupForm";
+
+export default function SignupComponent({setInPage}){
     return (
-        <div>This is signup component</div>
+        <>
+        <SignupForm setInPage={setInPage} />
+        </>
     );
 }

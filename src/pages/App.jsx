@@ -65,10 +65,10 @@ export default function App() {
   }
 
   return (
-      <main className="App">
+      <main className="App" onClick={handleClick}>
         <header className="App-header">
           <div className="flex-container-intro">
-            <h1 className={brandTextClass} onMouseLeave={glitch} onClick={handleClick}>
+            <h1 className={brandTextClass} onMouseLeave={glitch}>
               CONVAULT
             </h1>
             <sub className={brandMottoClass}>Your conversation vault</sub>
