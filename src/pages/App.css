@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Iso&display=swap');
+:root{
+  --background-dark: #1b1e22;
+  --black: #000;
+}
+
+body {
+  background-color: var(--background-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App{
+  text-align: center;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.blur-text {
+  transition: text-shadow 0.5s;
+}
+.blur-text:hover {
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+}
+
+.glitch-text {
+  position: relative;
+  transition: all 0.1s ease-in-out;
+}
+
+@keyframes glitch-animation {
+  0% { text-shadow: 10px 0 red; text-decoration:line-through; }
+  25% { text-shadow: -15px 0 blue; }
+  50% { text-shadow: 10px 0 green; }
+  75% { text-shadow: -10px 0 yellow;text-decoration: double; }
+  100% { text-shadow: 15px 0 red;text-decoration:line-through;}
+}
+
+.glitch-text:hover {
+  animation: glitch-animation 0.1s backwards;
+  
+}
+
+.brand-text{
+  font-size: 5rem;
+  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  transition: all 1s;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+.brand-text:hover{
+  text-shadow: 0.2rem 0 green;
+  cursor: pointer;
+}
+
+.brand-text.invisible{
+  opacity: 0;
+}
+
+.brand-text.fade-in{
+  opacity: 1;
+  transition: all 1s ease-out;
+}
+
+.brand-text.glitch{
+  animation: glitch-animation 0.2s infinite;
+}
+
+.brand-text.nudge {
+  margin-top: -50px;
+  margin-bottom: 0;
+}
+
+.invisible{
+  opacity: 0;
+  transition: all 1s;
+}
+
+.visible{
+  opacity: 1;
+}
+
+.d-none{
+  display: none;
+}
+
+.d-flex{
+  display: flex;
+}
+
+.d-block{
+  display: block;
+}
+
+.flex-container-intro{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+
+.brand-motto:not(.stable){
+  transform: translateY(100%);
+  transition: all 1s;
+}
+
+.brand-motto.stable{
+  position: relative;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.message-intro:not(.stable){
+  transform: translateY(200%);
+  transform: all 1s;
+}
+
+.start-btn{
+  border-radius: 5px;
+  background: hsla(201, 100%, 50%, 0.1);
+  border: 1px solid hsl(201, 100%, 29%);
+  outline: none;
+  font-size: 1.5em;
+  color: #fff;
+  font-weight: lighter;
+  margin-top: 20px;
+  cursor: pointer;
+}
+.start-btn:hover{
+  background-color: hsla(201, 100%, 50%, 0.3);
+}
+
+.start-btn:focus {
+  background-color: hsla(201, 100%, 50%, 0.5);
+}
+
+.slide-left {
+  transform: translateX(-100%);
+}
+
+.slide-right {
+  transform: translateX(100%);
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease;
+}
