@@ -6,6 +6,7 @@ import './App.css';
 export default function App() {
   const [brandTextClass, setBrandTextClass] = useState('brand-text invisible');
   const [brandMottoClass, setBrandMottoClass] = useState('brand-motto invisible');
+  const [animationEnded, setAnimationEnded] = useState(false);
   const { jwt, hasPublicKey } = useAuth();
   const navigate = useNavigate();
 
@@ -35,9 +36,11 @@ export default function App() {
 
     changeBrandTextClass('brand-text nudge glitch-text blur-text', 2000);
     changeBrandMottoClass('brand-motto', 2000);
+    const finish = setTimeout(()=>setAnimationEnded(true),2200);
 
     return () => {
       timeouts.forEach((id) => clearTimeout(id));
+      clearTimeout(finish);
     };
   }, []);
 
@@ -47,6 +50,7 @@ export default function App() {
   };
 
   const handleClick = () => {
+    if(!animationEnded) return;
     setBrandTextClass('brand-text glitch slide-left invisible');
     setBrandMottoClass('brand-motto invisible');
     setTimeout(() => {
@@ -61,7 +65,7 @@ export default function App() {
   }
 
   return (
-      <div className="App">
+      <main className="App">
         <header className="App-header">
           <div className="flex-container-intro">
             <h1 className={brandTextClass} onMouseLeave={glitch} onClick={handleClick}>
@@ -70,7 +74,7 @@ export default function App() {
             <sub className={brandMottoClass}>Your conversation vault</sub>
           </div>
         </header>
-      </div>
+      </main>
   );
 }
 

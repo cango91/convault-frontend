@@ -1,20 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik+Iso&display=swap');
-:root{
-  --background-dark: #1b1e22;
-  --black: #000;
-}
-
-body {
-  background-color: var(--background-dark);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
 .App{
   text-align: center;
 }
@@ -122,25 +105,6 @@ body {
 .message-intro:not(.stable){
   transform: translateY(200%);
   transform: all 1s;
-}
-
-.start-btn{
-  border-radius: 5px;
-  background: hsla(201, 100%, 50%, 0.1);
-  border: 1px solid hsl(201, 100%, 29%);
-  outline: none;
-  font-size: 1.5em;
-  color: #fff;
-  font-weight: lighter;
-  margin-top: 20px;
-  cursor: pointer;
-}
-.start-btn:hover{
-  background-color: hsla(201, 100%, 50%, 0.3);
-}
-
-.start-btn:focus {
-  background-color: hsla(201, 100%, 50%, 0.5);
 }
 
 .slide-left {

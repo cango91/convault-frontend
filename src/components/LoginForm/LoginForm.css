@@ -1,0 +1,91 @@
+.login-btn {
+    border-radius: 5px;
+    padding: 5px 10px;
+    background: hsla(201, 100%, 50%, 0.1);
+    border: 1px solid hsl(201, 100%, 18%);
+    outline: none;
+    color: antiquewhite;
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 1s;
+}
+
+.login-btn:hover {
+    background-color: hsla(201, 100%, 50%, 0.3);
+}
+
+.login-btn:focus {
+    background-color: hsla(201, 100%, 50%, 0.5);
+}
+
+.login-input {
+    background: hsla(201, 100%, 50%, 0.28);
+    margin-top: 10px;
+    border: 1px solid hsl(201, 100%, 18%);
+    color: antiquewhite;
+    font-size: 1.5rem;
+    border-radius: 0.875rem;
+    padding: 5px 10px;
+    text-align: center;
+    transition: all 1s;
+}
+
+.login-input::placeholder {
+    color: rgba(183, 183, 183, 0.638);
+}
+
+.login-text {
+    transition: all 1s;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+.app-link{
+    color: rgb(147, 197, 199);
+    font-size: 1rem;
+}
+.app-link:visited{
+    color: rgb(147, 197, 199);
+}
+
+.login-message{
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.signup-msg{
+    margin-left: auto;
+    text-align: right;
+    transition: all 1s;
+}
+
+.slide-from-right{
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.slide-from-left{
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.slide-from-above{
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.slide-from-below{
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+.error-msg-container{
+    border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.191);
+    color:aliceblue;
+    margin-top: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    transition: all 05.s;
+}
