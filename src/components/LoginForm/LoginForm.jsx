@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { login } from '../../utilities/api/users-api';
 import { setAccessToken } from '../../utilities/services/user-service';
+import { setClassWithDelay } from '../../utilities/utils';
 
 const initState = { username: '', password: '' };
 
@@ -24,45 +25,11 @@ export default function LoginForm({ inPage = false }) {
     useEffect(() => {
         /** Transition in animations */
         const timeouts = [];
-
-        const changeLoginTextClass = (newClass, delay) => {
-            const id = setTimeout(() => {
-                setLoginTextClass(newClass);
-            }, delay);
-            timeouts.push(id);
-        };
-
-        const changeUsernameClass = (newClass, delay) => {
-            const id = setTimeout(() => {
-                setUsernameClass(newClass);
-            }, delay);
-            timeouts.push(id);
-        }
-        const changePasswordClass = (newClass, delay) => {
-            const id = setTimeout(() => {
-                setPasswordClass(newClass);
-            }, delay);
-            timeouts.push(id);
-        }
-        const changeButtonClass = (newClass, delay) => {
-            const id = setTimeout(() => {
-                setButtonClass(newClass);
-            }, delay);
-            timeouts.push(id);
-        }
-        const changeSignupClass = (newClass, delay) => {
-            const id = setTimeout(() => {
-                setSignupClass(newClass);
-            }, delay);
-            timeouts.push(id);
-        }
-        changeLoginTextClass('login-text', 10);
-        changeUsernameClass('login-input', 10);
-        changePasswordClass('login-input', 10);
-        changeButtonClass('login-btn', 10);
-        changeSignupClass('signup-msg', inPage ? 10 : 1500);
-
-        /** Check for error message on the URL */
+        timeouts.push(setClassWithDelay(setLoginTextClass,'login-text'));
+        timeouts.push(setClassWithDelay(setUsernameClass,'login-input'));
+        timeouts.push(setClassWithDelay(setPasswordClass,'login-input'));
+        timeouts.push(setClassWithDelay(setButtonClass,'login-btn'));
+        timeouts.push(setClassWithDelay(setSignupClass,'signup-msg',inPage ? 10 : 1500));
 
         return (() => timeouts.forEach(timeout => clearTimeout(timeout)));
     }, [inPage]);

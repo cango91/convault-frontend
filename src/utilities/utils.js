@@ -64,3 +64,8 @@ export function parseJwt(token) {
 
     return JSON.parse(jsonPayload);
 }
+
+
+export function setClassWithDelay(setter,className='',delay=10){
+    return setTimeout(()=>setter(className),delay);
+}
