@@ -1,31 +1,66 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import './SignupForm.css';
+import { signup } from "../../utilities/api/users-api";
+import { useAuth } from "../../contexts/AuthContext";
+import { setAccessToken } from "../../utilities/services/user-service";
 
-export default function SignupForm({inPage, setInPage}) {
+const initialFormState = {
+    username: '',
+    email: '',
+    password: '',
+    confirm: '',
+}
+
+export default function SignupForm({ inPage, setInPage }) {
+    /** useState hooks */
     const [containerClass, setContainerClass] = useState('signup-container invisible');
     const [error, setError] = useState('');
+    const [formState, setFormState] = useState(initialFormState);
+    const {setJwt} = useAuth();
+
     const navigate = useNavigate();
     useEffect(() => {
         const t = setTimeout(() => setContainerClass('signup-container'), 10);
         return () => clearTimeout(t);
     }, []);
-    const handleSubmit = (e) => {
-        e.prventDefault();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const data = {...formState};
+        delete data.confirm;
+        try{
+            const res = await signup(data);
+            if(res.message){
+                setError(res.message);
+            }
+            setJwt(res.accessToken);
+            setAccessToken(res.accessToken);
+        }catch(e){
+
+        }
+    }
+
+    const handleChange = (e) => {
+        setFormState(prevState => ({ ...prevState, [e.target.name]: e.target.value }));
     }
 
     const transitionOut = (callback) => {
         setContainerClass('signup-container invisible');
-        setTimeout(callback,1000);
+        setTimeout(callback, 1000);
     }
 
-    const transitionToLoginPage = () =>{
+    const transitionToLoginPage = () => {
         setInPage(true);
-        transitionOut(()=>navigate('/login'));
+        transitionOut(() => navigate('/login'));
     }
 
+
+
+
+    const disabled = !formState.username || !formState.email || !formState.password || formState.password !== formState.confirm;
     return (
-        <div className={containerClass} style={{transition:'all 1s'}}>
+        <div className={containerClass} style={{ transition: 'all 1s' }}>
             <form className="signup-container" onSubmit={handleSubmit}>
                 <div className='login-text'>
                     Signup
@@ -36,6 +71,9 @@ export default function SignupForm({inPage, setInPage}) {
                     type="text"
                     name="username"
                     placeholder='username'
+                    value={formState.username}
+                    onChange={handleChange}
+                    required
                 />
                 <input
                     className='login-input'
@@ -43,6 +81,9 @@ export default function SignupForm({inPage, setInPage}) {
                     type="email"
                     name="email"
                     placeholder='email'
+                    value={formState.email}
+                    onChange={handleChange}
+                    required
                 />
                 <input
                     className='login-input'
@@ -50,15 +91,21 @@ export default function SignupForm({inPage, setInPage}) {
                     type="password"
                     name="password"
                     placeholder='password'
+                    value={formState.password}
+                    onChange={handleChange}
+                    required
                 />
                 <input
                     className='login-input'
-                    autoComplete='new-password'
+                    autoComplete='off'
                     type="password"
-                    name="password"
+                    name="confirm"
                     placeholder='confirm password'
+                    value={formState.confirm}
+                    onChange={handleChange}
+                    required
                 />
-                <button type='submit' className='login-btn' style={{ marginLeft: 'auto' }}>
+                <button disabled={disabled} type='submit' className='login-btn' style={{ marginLeft: 'auto' }}>
                     Signup
                 </button>
                 <div className='signup-msg'>
