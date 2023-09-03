@@ -13,14 +13,15 @@ export function useCrypto() {
 }
 
 export function CryptoProvider({ children }) {
-    const [mnemonic, setMnemonic] = useState(null);
+    const [mnemonic, setMnemonic] = useState([]);
     const generateMnemonic = (strength = 128) => {
-        const newMnemonic = bip39.generateMnemonic(wordlist, strength);
+        const newMnemonic = bip39.generateMnemonic(wordlist, strength).split(' ');
         setMnemonic(newMnemonic);
     };
     const validateMnemonic = (mn) => bip39.validateMnemonic(mn, wordlist);
+    const resetMnemonic = () => setMnemonic([]);
     return (
-        <CryptoContext.Provider value={{ mnemonic, generateMnemonic, validateMnemonic }}>
+        <CryptoContext.Provider value={{ mnemonic, generateMnemonic, validateMnemonic, resetMnemonic }}>
             {children}
         </CryptoContext.Provider>
     );

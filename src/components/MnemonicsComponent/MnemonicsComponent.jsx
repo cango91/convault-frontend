@@ -1,24 +1,51 @@
-import { useState,useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useCrypto } from '../../contexts/CryptoContext';
+import { useState, useEffect } from 'react';
+import MnemonicsInfoComponent from './MnemonicsInfoComponent';
 import './MnemonicsComponent.css';
-import { setClassWithDelay } from '../../utilities/utils';
+import MnemonicsGrid from './MnemonicsGrid';
 
-const MNEMONIC_STAGES = ['info','generation','confirmation'];
 
-export default function MnemonicsComponent(){
-    const [test,setTest] = useState('');
+export default function MnemonicsComponent({ onMnemonicsConfirmed }) {
+    const [stage, setStage] = useState('info');
+    const [subComponent, setSubComponent] = useState(null);
 
     useEffect(()=>{
-        const timer = setClassWithDelay(setTest,'test-class',10);
-        const timer2 = setClassWithDelay(setTest,'test-class-2',1000);
-        return ()=>{
-            clearTimeout(timer);
-            clearTimeout(timer2);
+        const infoNext = () => {
+            setStage('generation');
         }
-    },[]);
-
+        const genNext = () => {
+            setStage('confirmation');
+        }
+        const confirmNext = (val) =>{
+            if(val && val===true)
+                return confirmationSuccess();
+            return confirmationFail();
+        }
+        const confirmationFail = () => {
+            setStage('info');
+        }
+        const confirmationSuccess = () => {
+            onMnemonicsConfirmed();
+        }
+        switch (stage) {
+            case 'info':
+                setSubComponent(<MnemonicsInfoComponent onNext={infoNext} />);
+                break;
+            case 'generation':
+                setSubComponent(<MnemonicsGrid mode="generation" onNext={genNext} />);
+                break;
+            case 'confirmation':
+                setSubComponent(<MnemonicsGrid mode="confirmation" onNext={confirmNext} />);
+                break;
+            default:
+                setSubComponent(<MnemonicsInfoComponent onNext={infoNext} />);
+                break;
+        }
+    },[stage,onMnemonicsConfirmed]);
+    
     return (
-        <div className={test}>This is the MnemonicsComponent</div>
+        <>
+        {subComponent}
+        </>
+
     );
 }

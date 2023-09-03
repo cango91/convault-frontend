@@ -69,3 +69,8 @@ export function parseJwt(token) {
 export function setClassWithDelay(setter,className='',delay=10){
     return setTimeout(()=>setter(className),delay);
 }
+
+export function glitch(normalState, setter, delay = 150){
+    setter(normalState + ' glitch');
+    return setTimeout(() => setter(normalState), delay);
+}

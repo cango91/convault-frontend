@@ -1,0 +1,63 @@
+.mnemonics-grid{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 50px;
+}
+
+.mnemonics-next-btn{
+    margin-top: 50px;
+}
+
+.mnemonics-input{
+    background: hsla(201, 100%, 20%, 0.28);
+    border: 1px solid hsl(201, 100%, 18%);
+    color: antiquewhite;
+    border-radius: 0.6rem;
+    padding: 5px 5px;
+    font-size: (10px + 2vmin);
+}
+
+@media screen and (max-width: 600px) {
+    .mnemonics-grid{
+        gap: 20px;
+    }
+    .mnemonics-input {
+        font-size: 12px;
+        padding: 5px;
+        max-width: 100px;;
+    }
+
+}
+
+.instruction-text{
+    text-align: center;
+}
+
+.controls{
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-danger{
+    background: hsla(0, 100%, 20%, 0.28);
+    border: 1px solid hsl(0, 100%, 18%);
+}
+
+.btn-danger:hover{
+    background: hsla(0, 100%, 20%, 0.585);
+    border: 1px solid hsl(0, 100%, 18%);
+}
+
+.btn-danger:focus{
+    background: hsla(0, 100%, 31%, 0.585);
+    border: 1px solid hsl(0, 100%, 18%);
+}
+
+.error-text{
+    color:hsla(0, 65%, 52%, 0.733);
+}
+
+.glow-danger{
+    text-shadow: 0 0 8px rgba(199, 82, 82, 0.7);
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SignupForm from "../SignupForm/SignupForm";
 import { useAuth } from "../../contexts/AuthContext";
+import SignupForm from "../SignupForm/SignupForm";
 import MnemonicsComponent from "../MnemonicsComponent/MnemonicsComponent";
 import LogoutButton from "../LogoutButton/LogoutButton";
 
