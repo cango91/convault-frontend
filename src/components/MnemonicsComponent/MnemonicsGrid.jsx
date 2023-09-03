@@ -16,6 +16,7 @@ export default function MnemonicsGrid({ mode, onNext }) {
     const inputsRef = useRef([]);
     const removeIdxRef = useRef(new Set());
 
+    /** Set data depending on mode and whether we have generated mnemonic */
     useEffect(() => {
         if (mode === 'newSession') {
             inputsRef.current[0].focus();
@@ -26,15 +27,17 @@ export default function MnemonicsGrid({ mode, onNext }) {
         if (mode === 'confirmation') {
             removeIdxRef.current = new Set();
             while (removeIdxRef.current.size < 3) {
-                removeIdxRef.current.add(Math.ceil(Math.random() * 11));
+                removeIdxRef.current.add(Math.ceil(Math.random() * 12 - 1));
             }
         }
     }, [mnemonic, mode, generateMnemonic]);
+    /** Fade in */
     useEffect(() => {
         const timeouts = [];
         timeouts.push(setClassWithDelay(setContainerClass, 'mnemonics-container'));
         return () => timeouts.forEach(t => clearTimeout(t));
     }, []);
+    /** Update visuals for generation mode */
     useEffect(() => {
         const timers = [];
         if (mode === 'generation') {
@@ -47,11 +50,12 @@ export default function MnemonicsGrid({ mode, onNext }) {
         }
         return () => timers.forEach(t => clearTimeout(t));
     }, [mode]);
-
+    /** Enable next button for confirmation or newSession modes */
     useEffect(() => {
         setDisabled((mode === 'confirmation' || mode === 'newSession') && !allWordsEntered)
     }, [allWordsEntered, mode]);
 
+    /** handleNext and fade out */
     const handleNext = () => {
         if (mode === 'generation') {
             setContainerClass('mnemonics-container invisible');
@@ -66,6 +70,7 @@ export default function MnemonicsGrid({ mode, onNext }) {
                 setContainerClass('mnemonics-container invisible');
                 setTimeout(() => onNext(true), 500);
             } else {
+                /** Set error message/instruction and visuals */
                 setRestartBtnClass('login-btn mnemonics-next-btn btn-danger invisible');
                 setClassWithDelay(setRestartBtnClass, 'login-btn mnemonics-next-btn btn-danger', 10);
                 setInstructionText('OOPS... TRY AGAIN, OR RE-GENERATE WORDS');
@@ -91,12 +96,11 @@ export default function MnemonicsGrid({ mode, onNext }) {
         }
         return true;
     }
-
+    /** Clear existing mnemonic for next round */
     const handleRestart = () => {
         resetMnemonic();
         setContainerClass('mnemonics-container invisible');
         setTimeout(() => onNext(false), 500);
-
     }
 
     return (

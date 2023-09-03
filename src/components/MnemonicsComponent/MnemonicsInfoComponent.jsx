@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { setClassWithDelay, glitch } from "../../utilities/utils";
 
 export default function MnemonicsInfoComponent({onNext}){
     const [importantClass, setImportantClass] = useState('');
@@ -6,14 +7,12 @@ export default function MnemonicsInfoComponent({onNext}){
     const [dangerClass,setDangerClass] = useState('');
     const [respClass,setRespClass] = useState('');
     const [btnClass, setBtnClass] = useState('login-btn invisible');
-    const [containerClass, setContainerClass] = useState('mnemonics-container');
-    const glitch = (normalState, setter, delay = 150) => {
-        setter(normalState + ' glitch');
-        setTimeout(() => setter(normalState), delay);
-    }
+    const [containerClass, setContainerClass] = useState('mnemonics-container invisible');
+
     useEffect(() => {
         const timeouts = [];
         glitch('', setImportantClass);
+        timeouts.push(setClassWithDelay(setContainerClass, 'mnemonics-container'));
         timeouts.push(setTimeout(() => glitch('', setTwWordsClass), 300));
         timeouts.push(setTimeout(() => glitch('', setImportantClass), 500));
         timeouts.push(setTimeout(() => glitch('', setTwWordsClass), 1100));
