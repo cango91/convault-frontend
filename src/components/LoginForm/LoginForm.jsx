@@ -5,10 +5,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { login } from '../../utilities/api/users-api';
 import { setAccessToken } from '../../utilities/services/user-service';
 
-const initState = {username: '', password: ''};
+const initState = { username: '', password: '' };
 
 export default function LoginForm({ inPage = false }) {
-    const [formData,setFormData] = useState(initState);
+    const [formData, setFormData] = useState(initState);
     const [loginTextClass, setLoginTextClass] = useState(`login-text ${!inPage ? 'slide-from-above' : 'invisible'}`);
     const [usernameClass, setUsernameClass] = useState(`login-input ${!inPage ? 'slide-from-right' : 'invisible'}`);
     const [passwordClass, setPasswordClass] = useState(`login-input ${!inPage ? 'slide-from-left' : 'invisible'}`);
@@ -16,8 +16,9 @@ export default function LoginForm({ inPage = false }) {
     const [signupClass, setSignupClass] = useState('signup-msg invisible');
     const [containerClass, setContainerClass] = useState('flex-container-intro');
     const [error, setError] = useState('');
+    const [errorClass, setErrorClass] = useState('error-text');
     const navigate = useNavigate();
-    const {setJwt} = useAuth();
+    const { setJwt } = useAuth();
 
 
     useEffect(() => {
@@ -70,29 +71,53 @@ export default function LoginForm({ inPage = false }) {
         setContainerClass('flex-container-intro invisible');
         setTimeout(callback, 1000);
     }
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        transitionOut(async () => {
-            // try to login
-            try {
-                const res = await login(formData);
-                if(res.message){
-                    setError(res.message);
-                    setContainerClass('flex-container-intro visible');
-                }else{
-                    setJwt(res.accessToken);
-                    setAccessToken(res.accessToken);
-                }
-            } catch (error) {
-                setContainerClass('flex-container-intro');
-                setError(error.message);
-            }
-        })
+    const glitchError = () => {
+        setErrorClass('error-text glitch');
+        setTimeout(() => setErrorClass('error-text'), 200);
     }
 
-    const onFormChange = e =>{
-        setFormData(prevData => ({...prevData, [e.target.name]: e.target.value}));
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await login(formData);
+            if (res.message) {
+                setError(res.message);
+                setContainerClass('flex-container-intro visible');
+                glitchError();
+            } else {
+                transitionOut(() => {
+                    setJwt(res.accessToken);
+                    setAccessToken(res.accessToken);
+                });
+
+
+            }
+        } catch (error) {
+            setContainerClass('flex-container-intro');
+            setError(error.message);
+        }
+
+
+        // transitionOut(async () => {
+        //     // try to login
+        //     try {
+        //         const res = await login(formData);
+        //         if(res.message){
+        //             setError(res.message);
+        //             setContainerClass('flex-container-intro visible');
+        //         }else{
+        //             setJwt(res.accessToken);
+        //             setAccessToken(res.accessToken);
+        //         }
+        //     } catch (error) {
+        //         setContainerClass('flex-container-intro');
+        //         setError(error.message);
+        //     }
+        // });
+    }
+
+    const onFormChange = e => {
+        setFormData(prevData => ({ ...prevData, [e.target.name]: e.target.value }));
     }
 
     return (
@@ -135,7 +160,7 @@ export default function LoginForm({ inPage = false }) {
                     </p>
                 </div>
                 <div className={`error-msg-container ${error ? '' : 'invisible'}`}>
-                    {error}
+                    <span className={errorClass}>{error}</span>
                 </div>
             </form>
 

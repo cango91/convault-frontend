@@ -17,6 +17,7 @@ export default function SignupForm({ inPage, setInPage }) {
     const [containerClass, setContainerClass] = useState('signup-container invisible');
     const [error, setError] = useState('');
     const [formState, setFormState] = useState(initialFormState);
+    const [errorClass, setErrorClass] = useState('error-text');
     const {setJwt} = useAuth();
 
     const navigate = useNavigate();
@@ -24,6 +25,11 @@ export default function SignupForm({ inPage, setInPage }) {
         const t = setTimeout(() => setContainerClass('signup-container'), 10);
         return () => clearTimeout(t);
     }, []);
+
+    const glitchError = () => {
+        setErrorClass('error-text glitch');
+        setTimeout(() => setErrorClass('error-text'), 200);
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,9 +39,13 @@ export default function SignupForm({ inPage, setInPage }) {
             const res = await signup(data);
             if(res.message){
                 setError(res.message);
+                glitchError();
             }
-            setJwt(res.accessToken);
-            setAccessToken(res.accessToken);
+            transitionOut(()=>{
+                setJwt(res.accessToken);
+                setAccessToken(res.accessToken);
+            });
+            
         }catch(e){
 
         }
@@ -119,7 +129,7 @@ export default function SignupForm({ inPage, setInPage }) {
                     </p>
                 </div>
                 <div className={`error-msg-container ${error ? '' : 'invisible'}`}>
-                    {error}
+                    <span className={errorClass}>{error}</span>
                 </div>
             </form>
 
