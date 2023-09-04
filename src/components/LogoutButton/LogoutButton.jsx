@@ -6,11 +6,12 @@ import './LogoutButton.css';
 export default function LogoutButton(){
     const navigate = useNavigate();
     const {setJwt} = useAuth();
-    const {resetMnemonic} = useCrypto();
+    const {resetMnemonic, deleteKeys} = useCrypto();
     const handleClick = async () =>{
         await logout();
         setJwt(null);
         resetMnemonic();
+        deleteKeys();
         navigate('/');
     }
     return (

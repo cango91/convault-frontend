@@ -1,6 +1,7 @@
 import { createContext, useState, useContext } from "react";
 import * as bip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
+import { arrayBufferToBase64 } from "../utilities/utils";
 
 const CryptoContext = createContext();
 
@@ -24,6 +25,7 @@ export function CryptoProvider({ children }) {
     const validateMnemonic = (mn) => bip39.validateMnemonic(mn, wordlist);
     const resetMnemonic = () => setMnemonic([]);
     const generateKeys = () => {
+        if(privateKey && publicKey) return;
         window.crypto.subtle.generateKey({
             name: 'RSA-OAEP',
             modulusLength: 4096,
@@ -37,10 +39,47 @@ export function CryptoProvider({ children }) {
             setPublicKey(keyPair.publicKey);
         });
     }
+
+    const deleteKeys = () =>{
+        setPrivateKey(null);
+        setPublicKey(null);
+    }
+
+    const exportPrivateKey = async () => {
+        if(!privateKey) return;
+        try {
+            const exported = await window.crypto.subtle.exportKey("pkcs8",privateKey);
+            const exportedKeyBuffer = new Uint8Array(exported);
+            const base64Key = arrayBufferToBase64(exportedKeyBuffer);
+            const pemKey = `-----BEGIN PRIVATE KEY-----\n${base64Key}\n-----END PRIVATE KEY-----`;
+            return pemKey;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const importKey = async (arrayBuffer) => {
+        const privateKey = await window.crypto.subtle.importKey(
+          "pkcs8",
+          arrayBuffer,
+          {
+            name: "RSA-OAEP",
+            hash: "SHA-256",
+          },
+          true,
+          ["decrypt"]
+        );
+        return privateKey;
+      };
+      
+
     const value = {
         generateKeys,
+        deleteKeys,
         privateKey,
         publicKey,
+        exportPrivateKey,
+        importKey,
         mnemonic,
         generateMnemonic,
         validateMnemonic,

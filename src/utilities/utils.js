@@ -66,11 +66,28 @@ export function parseJwt(token) {
 }
 
 
-export function setClassWithDelay(setter,className='',delay=10){
-    return setTimeout(()=>setter(className),delay);
+export function setClassWithDelay(setter, className = '', delay = 10) {
+    return setTimeout(() => setter(className), delay);
 }
 
-export function glitch(normalState, setter, delay = 150){
+export function glitch(normalState, setter, delay = 150) {
     setter(normalState + ' glitch');
     return setTimeout(() => setter(normalState), delay);
 }
+
+export function arrayBufferToBase64(buffer) {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    bytes.forEach((b) => (binary += String.fromCharCode(b)));
+    return window.btoa(binary);
+};
+
+export function base64ToArrayBuffer(base64) {
+    const binaryString = window.atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+};

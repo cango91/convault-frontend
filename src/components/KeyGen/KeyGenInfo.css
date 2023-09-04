@@ -19,3 +19,14 @@
     flex-direction: column;
     align-items: center;
   }
+
+  .please-wait{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .download-section{
+    text-align: center;
+    transition: all 0.5s;
+  }
