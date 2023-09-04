@@ -14,14 +14,40 @@ export function useCrypto() {
 
 export function CryptoProvider({ children }) {
     const [mnemonic, setMnemonic] = useState([]);
+    const [privateKey, setPrivateKey] = useState(null);
+    const [publicKey,setPublicKey] = useState(null);
+
     const generateMnemonic = (strength = 128) => {
         const newMnemonic = bip39.generateMnemonic(wordlist, strength).split(' ');
         setMnemonic(newMnemonic);
     };
     const validateMnemonic = (mn) => bip39.validateMnemonic(mn, wordlist);
     const resetMnemonic = () => setMnemonic([]);
+    const generateKeys = () => {
+        window.crypto.subtle.generateKey({
+            name: 'RSA-OAEP',
+            modulusLength: 4096,
+            publicExponent: new Uint8Array([1,0,1]),
+            hash: 'SHA-256',
+        },
+        true,
+        ["encrypt","decrypt"]
+        ).then(keyPair => {
+            setPrivateKey(keyPair.privateKey);
+            setPublicKey(keyPair.publicKey);
+        });
+    }
+    const value = {
+        generateKeys,
+        privateKey,
+        publicKey,
+        mnemonic,
+        generateMnemonic,
+        validateMnemonic,
+        resetMnemonic,
+    }
     return (
-        <CryptoContext.Provider value={{ mnemonic, generateMnemonic, validateMnemonic, resetMnemonic }}>
+        <CryptoContext.Provider value={value}>
             {children}
         </CryptoContext.Provider>
     );

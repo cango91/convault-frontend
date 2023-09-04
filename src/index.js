@@ -6,6 +6,7 @@ import { CryptoProvider } from './contexts/CryptoContext';
 import './index.css';
 import App from './pages/App';
 import AuthPage from './pages/AuthPage/AuthPage';
+import { ExtensionProvider } from './contexts/ExtensionContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -13,13 +14,15 @@ root.render(
     <Router>
       <AuthProvider>
         <CryptoProvider>
-          <Routes>
-            <Route path='/' element={<App />} />
-            <Route path='/login' element={<AuthPage />} />
-            <Route path='/signup' element={<AuthPage />} />
-            <Route path='/chat' />
-            <Route path='/*' element={<App />} />
-          </Routes>
+          <ExtensionProvider>
+            <Routes>
+              <Route path='/' element={<App />} />
+              <Route path='/login' element={<AuthPage />} />
+              <Route path='/signup' element={<AuthPage />} />
+              <Route path='/chat' />
+              <Route path='/*' element={<App />} />
+            </Routes>
+          </ExtensionProvider>
         </CryptoProvider>
       </AuthProvider>
     </Router>
