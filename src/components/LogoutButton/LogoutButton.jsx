@@ -5,13 +5,14 @@ import { useCrypto } from '../../contexts/CryptoContext';
 import './LogoutButton.css';
 export default function LogoutButton(){
     const navigate = useNavigate();
-    const {setJwt} = useAuth();
+    const {setJwt, setHasPublicKey} = useAuth();
     const {resetMnemonic, deleteKeys} = useCrypto();
     const handleClick = async () =>{
         await logout();
         setJwt(null);
         resetMnemonic();
         deleteKeys();
+        setHasPublicKey(false);
         navigate('/');
     }
     return (

@@ -4,37 +4,49 @@ import LoginForm from '../../components/LoginForm/LoginForm';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import SignupComponent from '../../components/SignupComponent/SignupComponent';
-export default function AuthPage(){
+import { refreshUser } from '../../utilities/api/users-api';
+export default function AuthPage() {
     const [showLoginPage, setShowLoginPage] = useState(true);
     const [slidingTransition, setSlidingTransition] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
-    const {jwt, hasPublicKey} = useAuth();
+    const { jwt, hasPublicKey, refreshUserToken } = useAuth();
     useEffect(()=>{
-        if(jwt && hasPublicKey){
+        async function ref(){
+            await refreshUser();
+        }
+        ref();
+    },[]);
+
+    useEffect(()=>{
+        refreshUserToken();
+    },[refreshUserToken]);
+
+    useEffect(() => {
+        if (jwt && hasPublicKey) {
             navigate('/chat');
-        }else if(jwt && !hasPublicKey){
+        } else if (jwt && !hasPublicKey) {
             setShowLoginPage(false);
-        }else{
-            if(/login/i.test(location.pathname)){
+        } else {
+            if (/login/i.test(location.pathname)) {
                 setShowLoginPage(true);
-            }else{
+            } else {
                 setShowLoginPage(false);
             }
         }
-    },[navigate,jwt,hasPublicKey,location]);
+    }, [navigate, jwt, hasPublicKey, location]);
 
-    const setInPage = (val) =>{
+    const setInPage = (val) => {
         setSlidingTransition(!val);
     }
-    
+
     return (
         <main>
             {
-                showLoginPage ? 
-                <LoginForm inPage={!slidingTransition} />
-                :
-                <SignupComponent setInPage={setInPage} />
+                showLoginPage ?
+                    <LoginForm inPage={!slidingTransition} />
+                    :
+                    <SignupComponent setInPage={setInPage} />
             }
         </main>
     );

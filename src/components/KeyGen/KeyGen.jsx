@@ -1,6 +1,7 @@
 import { useState } from "react";
 import KeyGenInfo from "./KeyGenInfo";
 import GenerateKeys from "./GenerateKeys";
+import PostPublicKey from "./PostPublicKey";
 
 export default function KeyGen(){
     const [stage,setStage] = useState('info');
@@ -19,7 +20,11 @@ export default function KeyGen(){
         }
         {
             stage === 'generateKeys' &&
-            <GenerateKeys />
+            <GenerateKeys onCompleteSignup={onCompleteSignup} />
+        }
+        {
+            stage === 'completeSignup' &&
+            <PostPublicKey />
         }
         </>
     );

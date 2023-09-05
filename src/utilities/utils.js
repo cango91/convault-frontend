@@ -1,5 +1,32 @@
 import { getAccessToken, setAccessToken } from "./services/user-service";
-export async function sendRequest(url, method = 'GET', payload = null, autoLogout = true) {
+// let timeoutId = null;
+
+// function debounceAsync(func, delay) {
+//   return (...args) => {
+//     return new Promise((resolve, reject) => {
+//       if (timeoutId) {
+//         clearTimeout(timeoutId);
+//       }
+
+//       timeoutId = setTimeout(async () => {
+//         try {
+//           const result = await func(...args);
+//           resolve(result);
+//         } catch (error) {
+//           reject(error);
+//         }
+//       }, delay);
+//     });
+//   };
+// }
+
+// const debouncedSendRequest = debounceAsync(_sendRequest, 100);
+
+// export async function sendRequest(url, method = 'GET', payload = null, autoLogout = false) {
+//   return debouncedSendRequest(url, method, payload, autoLogout);
+// }
+
+export async function sendRequest(url, method = 'GET', payload = null, autoLogout = false) {
     const options = { method };
     if (payload) {
         options.headers = { 'Content-Type': 'application/json' };
@@ -24,7 +51,7 @@ export async function sendRequest(url, method = 'GET', payload = null, autoLogou
                 if (!await checkTokenStatus()) {
                     // logout and redirect to login
                     localStorage.removeItem('jwt');
-                    await fetch('/api/auth/logout', { method: 'POST' });
+                    await fetch('/api/users/logout', { method: 'POST' });
                     return { redirect: '/login', message: 'session expired' }
                 }
             }
@@ -39,7 +66,7 @@ export async function sendRequest(url, method = 'GET', payload = null, autoLogou
 
 export async function checkTokenStatus() {
     try {
-        const res = await fetch('/api/auth/token-status', {
+        const res = await fetch('/api/users/token-status', {
             method: 'POST',
             headers: { 'Content-type': 'application/json' }
         });

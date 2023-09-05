@@ -7,6 +7,7 @@ import './index.css';
 import App from './pages/App';
 import AuthPage from './pages/AuthPage/AuthPage';
 import { ExtensionProvider } from './contexts/ExtensionContext';
+import LogoutButton from './components/LogoutButton/LogoutButton';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -19,7 +20,7 @@ root.render(
               <Route path='/' element={<App />} />
               <Route path='/login' element={<AuthPage />} />
               <Route path='/signup' element={<AuthPage />} />
-              <Route path='/chat' />
+              <Route path='/chat' element={<LogoutButton />} />
               <Route path='/*' element={<App />} />
             </Routes>
           </ExtensionProvider>

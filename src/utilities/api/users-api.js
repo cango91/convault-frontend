@@ -17,3 +17,11 @@ export async function logout() {
 export async function login(userData) {
     return await sendRequest(`${BASE_URL}/login`, 'POST', userData);
 }
+
+export async function postPublicKey(key){
+    return await sendRequest(`${BASE_URL}/pk`,'POST',key);
+}
+
+export async function refreshUser(){
+    return await sendRequest(`${BASE_URL}/refresh`,'POST');
+}

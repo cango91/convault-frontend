@@ -8,15 +8,19 @@ import LocalStorageForm from "../LocalStorageForm/LocalStorageForm";
 import ThreeTierSecurityForm from "../ThreeTierSecurityForm/ThreeTierSecurityForm";
 import { useExtension } from "../../contexts/ExtensionContext";
 import KeyGen from "../KeyGen/KeyGen";
+import { refreshUser } from "../../utilities/api/users-api";
 
 export default function SignupComponent({ setInPage }) {
     const [signupStage, setSignupStage] = useState('signup');
     // const [mnemonicConfirmed, setMnemonicConfirmed] = useState(false);
     const { jwt, hasPublicKey } = useAuth();
     const navigate = useNavigate();
-
-
-    
+    useEffect(()=>{
+        async function ref(){
+            await refreshUser();
+        }
+        ref();
+    },[]);
     useEffect(() => {
         if(!jwt){
             setSignupStage('signup');

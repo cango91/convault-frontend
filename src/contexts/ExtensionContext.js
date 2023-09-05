@@ -30,12 +30,12 @@ export function ExtensionProvider({ children }) {
                 } else {
                     throw new Error(await response.body());
                 }
+                checkExtension();
             } catch (error) {
                 console.error("Couldn't fetch extension ids: ", error.message);
             }
         }
-        fetchIds();
-        checkExtension();
+        
         const handleMessages = (evt) => {
             if (evt.source !== window || !verifyMessageSource(evt)) return;
             const { type } = evt.data;
@@ -50,10 +50,11 @@ export function ExtensionProvider({ children }) {
         }
 
         window.addEventListener('message', handleMessages);
-
+        window.addEventListener('load',fetchIds);
 
         return () => {
             window.removeEventListener('message', handleMessages);
+            window.removeEventListener('load',fetchIds);
         }
     }, []);
 

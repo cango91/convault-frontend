@@ -18,7 +18,7 @@ export default function SignupForm({ inPage, setInPage }) {
     const [error, setError] = useState('');
     const [formState, setFormState] = useState(initialFormState);
     const [errorClass, setErrorClass] = useState('error-text');
-    const {setJwt} = useAuth();
+    const { setJwt } = useAuth();
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -33,21 +33,23 @@ export default function SignupForm({ inPage, setInPage }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const data = {...formState};
+        const data = { ...formState };
         delete data.confirm;
-        try{
+        try {
             const res = await signup(data);
-            if(res.message){
+            if (res.message) {
                 setError(res.message);
                 glitchError();
+            } else {
+                transitionOut(() => {
+                    setJwt(res.accessToken);
+                    setAccessToken(res.accessToken);
+                });
             }
-            transitionOut(()=>{
-                setJwt(res.accessToken);
-                setAccessToken(res.accessToken);
-            });
-            
-        }catch(e){
 
+        } catch (e) {
+            setError(e.message);
+            glitchError();
         }
     }
 
@@ -80,6 +82,7 @@ export default function SignupForm({ inPage, setInPage }) {
                     autoComplete='username'
                     type="text"
                     name="username"
+                    pattern="^\S*$"
                     placeholder='username'
                     value={formState.username}
                     onChange={handleChange}

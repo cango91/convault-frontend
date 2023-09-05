@@ -58,7 +58,20 @@ export function CryptoProvider({ children }) {
         }
     }
 
-    const importKey = async (arrayBuffer) => {
+    const exportPublicKey = async () =>{
+        if(!publicKey) return;
+        try{
+            const exported = await window.crypto.subtle.exportKey("spki",publicKey);
+            const exportedKeyBuffer = new Uint8Array(exported);
+            const base64Key = arrayBufferToBase64(exportedKeyBuffer);
+            const pemKey = `-----BEGIN PUBLIC KEY-----\n${base64Key}\n-----END PUBLIC KEY-----`;
+            return pemKey;
+        }catch(error){
+            console.error(error);
+        }
+    }
+
+    const importPrivateKey = async (arrayBuffer) => {
         const privateKey = await window.crypto.subtle.importKey(
           "pkcs8",
           arrayBuffer,
@@ -79,7 +92,8 @@ export function CryptoProvider({ children }) {
         privateKey,
         publicKey,
         exportPrivateKey,
-        importKey,
+        exportPublicKey,
+        importPrivateKey,
         mnemonic,
         generateMnemonic,
         validateMnemonic,
