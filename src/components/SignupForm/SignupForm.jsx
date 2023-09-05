@@ -87,6 +87,7 @@ export default function SignupForm({ inPage, setInPage }) {
                     value={formState.username}
                     onChange={handleChange}
                     required
+                    title="Username should not contain spaces."
                 />
                 <input
                     className='login-input'
@@ -106,6 +107,7 @@ export default function SignupForm({ inPage, setInPage }) {
                     placeholder='password'
                     value={formState.password}
                     onChange={handleChange}
+                    title="Password should contain at least 8 characters. 1 Uppercase, 1 lowercase, 1 number and 1 special character required."
                     required
                 />
                 <input
