@@ -11,17 +11,17 @@ import { useEffect } from "react";
 import { base64ToArrayBuffer } from "../utilities/utils";
 export default function App() {
     const { jwt, hasPublicKey } = useAuth();
-    const { importPublicKey } = useCrypto();
+    const { importPublicKey, publicKey } = useCrypto();
     /** If the jwt has a public key, add it to our state */
     useEffect(() => {
         const user = getUser();
         if (user && user.publicKey) {
             const header = "-----BEGIN PUBLIC KEY-----";
             const footer = "-----END PUBLIC KEY-----";
-            let key = user.publicKey.replace(header,"").replace(footer,"").replace(/\s+/g,"");
+            let key = user.publicKey.replace(header, "").replace(footer, "").replace(/\s+/g, "");
             importPublicKey(base64ToArrayBuffer(key));
         }
-    }, [hasPublicKey]);
+    }, [jwt]);
     return (
         <>
             {jwt && <WelcomeHeader username={getUser().username} />}
@@ -30,7 +30,9 @@ export default function App() {
                 <Route path='/' element={<Home />} />
                 <Route path='/login' element={<AuthPage />} />
                 <Route path='/signup' element={<AuthPage />} />
-                <Route path='/chat' element={<ChatPage />} />
+                {jwt && publicKey &&
+                    <Route path='/chat' element={<ChatPage />} />
+                }
                 <Route path='/*' element={<Home />} />
             </Routes>
         </>

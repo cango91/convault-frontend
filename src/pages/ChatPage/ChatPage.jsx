@@ -10,10 +10,10 @@ export default function ChatPage() {
     const { jwt } = useAuth();
     const {privateKey, publicKey} = useCrypto();
     const navigate = useNavigate();
-    
-    useEffect(()=>{
-        if(!jwt) navigate('/login');
-    },[navigate,jwt]);
+
+    // useEffect(()=>{
+    //     if(!jwt) navigate('/login');
+    // },[jwt]);
 
     return (
         <>
