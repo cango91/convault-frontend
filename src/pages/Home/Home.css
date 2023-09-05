@@ -19,13 +19,6 @@
   transition: all 0.1s ease-in-out;
 }
 
-@keyframes glitch-animation {
-  0% { text-shadow: 10px 0 red; text-decoration:line-through; }
-  25% { text-shadow: -15px 0 blue; }
-  50% { text-shadow: 10px 0 green; }
-  75% { text-shadow: -10px 0 yellow;text-decoration: double; }
-  100% { text-shadow: 15px 0 red;text-decoration:line-through;}
-}
 
 .glitch-text:hover {
   animation: glitch-animation 0.1s backwards;
@@ -62,32 +55,6 @@
   margin-bottom: 0;
 }
 
-.invisible{
-  opacity: 0;
-  transition: all 1s;
-  pointer-events: none;
-}
-
-.invisible:hover{
-  cursor: default;
-}
-
-.visible{
-  opacity: 1;
-}
-
-.d-none{
-  display: none;
-}
-
-.d-flex{
-  display: flex;
-}
-
-.d-block{
-  display: block;
-}
-
 .flex-container-intro{
   display: flex;
   flex-direction: column;
@@ -120,37 +87,6 @@
 
 .slide-right {
   transform: translateX(100%);
-}
-
-.fade-in {
-  opacity: 1;
-  transition: opacity 1s ease;
-}
-
-.fade-out {
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-
-.glow{
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
-}
-
-.mb-1{
-  margin-bottom: 0.5rem !important;
-}
-.mb-2{
-  margin-bottom: 1rem !important;
-}
-.mb-3{
-  margin-bottom: 1.5rem !important;
-}
-
-.app-link-normal{
-  font-size: inherit !important;
-  border: none;
-  background-color: inherit;
-  text-decoration: underline;
 }
 
 .app-link-normal:hover{

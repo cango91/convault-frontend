@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const ExtensionContext = createContext();
 const BASE_URL = '/api/extension'
+const ALLOWED_ORIGIN = '*';
 
 export function useExtension() {
     const context = useContext(ExtensionContext);
@@ -15,7 +16,12 @@ export function ExtensionProvider({ children }) {
     const [validIdList, setValidIdList] = useState([]);
     const [hasExtension, setHasExtension] = useState(false);
     const [extensionVersion, setExtensionVersion] = useState(null);
-    const checkExtension = () => window.postMessage({type: 'VERSION'},'*');
+    const [user, setUser] = useState(null);
+    const [currentUserHasKeyStored, setCurrentUserHasKeyStored] = useState(false);
+
+    const checkExtension = () => window.postMessage({type: 'VERSION'},ALLOWED_ORIGIN);
+    const checkUserStore = (id) => window.postMessage({type: 'QUERY_FOR_USER', id})
+    
     useEffect(() => {
         const verifyMessageSource = (evt) => {
             // TODO: Add actual verification when extension deployed.
@@ -44,6 +50,9 @@ export function ExtensionProvider({ children }) {
                     setHasExtension(true);
                     setExtensionVersion(evt.data.version);
                     break;
+                case 'USER_QUERY':
+                    setCurrentUserHasKeyStored(evt.data.inStore);
+                    break;
                 default:
                     return;
             }
@@ -58,13 +67,19 @@ export function ExtensionProvider({ children }) {
         }
     }, []);
 
-    
+    const setCurrentUser = (user) => {
+        setUser(user);
+        if(user)
+            checkUserStore(user._id);
+    }
 
     const value = {
         validIdList,
         checkExtension,
         hasExtension,
         extensionVersion,
+        setCurrentUser,
+        currentUserHasKeyStored,
     };
 
     return (

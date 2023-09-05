@@ -1,4 +1,4 @@
-:root{
+:root {
   --background-dark: #1b1e22;
   --black: #000;
 }
@@ -25,13 +25,155 @@ code {
     monospace;
 }
 
-.flex-ctr{
+.flex-ctr {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 50px;
   transition: opacity 0.5s;
 }
-.glitch{
+
+.glitch {
   animation: glitch-animation 0.2s infinite;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.invisible {
+  opacity: 0;
+  transition: all 1s;
+  pointer-events: none;
+}
+
+.invisible:hover {
+  cursor: default;
+}
+
+.visible {
+  opacity: 1;
+}
+
+.d-none {
+  display: none;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-block {
+  display: block;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.glow {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+.mb-1 {
+  margin-bottom: 0.5rem !important;
+}
+
+.mb-2 {
+  margin-bottom: 1rem !important;
+}
+
+.mb-3 {
+  margin-bottom: 1.5rem !important;
+}
+
+.app-link-normal {
+  font-size: inherit !important;
+  border: none;
+  background-color: inherit;
+  text-decoration: underline;
+}
+
+.instruction-text {
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btn-danger {
+  background: hsla(0, 100%, 20%, 0.28);
+  border: 1px solid hsl(0, 100%, 18%);
+}
+
+.btn-danger:hover {
+  background: hsla(0, 100%, 20%, 0.585);
+  border: 1px solid hsl(0, 100%, 18%);
+}
+
+.btn-danger:focus {
+  background: hsla(0, 100%, 31%, 0.585);
+  border: 1px solid hsl(0, 100%, 18%);
+}
+
+.error-text {
+  color: hsla(0, 65%, 52%, 0.733);
+}
+
+.glow-danger {
+  text-shadow: 0 0 8px rgba(199, 82, 82, 0.7);
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #ffffff;
+  animation: spin 0.8s infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+@keyframes glitch-animation {
+  0% {
+    text-shadow: 10px 0 red;
+    text-decoration: line-through;
+  }
+
+  25% {
+    text-shadow: -15px 0 blue;
+  }
+
+  50% {
+    text-shadow: 10px 0 green;
+  }
+
+  75% {
+    text-shadow: -10px 0 yellow;
+    text-decoration: double;
+  }
+
+  100% {
+    text-shadow: 15px 0 red;
+    text-decoration: line-through;
+  }
 }
