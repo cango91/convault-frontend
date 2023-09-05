@@ -8,8 +8,8 @@ export async function signup(userData) {
 }
 
 export async function logout() {
-    if (getAccessToken) {
-        await fetch(`${BASE_URL}/logout`, { method: 'POST' });
+    if (getAccessToken()) {
+        await fetch(`${BASE_URL}/logout`, { method: 'POST',headers:{"Authorization": `Bearer ${getAccessToken()}`} });
         localStorage.removeItem('jwt');
     }
 }

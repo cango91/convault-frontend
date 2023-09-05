@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { CryptoProvider } from './contexts/CryptoContext';
-import './index.css';
 import { ExtensionProvider } from './contexts/ExtensionContext';
 import App from './pages/App';
+import './index.css';
+import './components/MnemonicsComponent/MnemonicsComponent.css'; // TODO: move css to more appropriate place and rename
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

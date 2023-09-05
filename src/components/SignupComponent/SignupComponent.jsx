@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import SignupForm from "../SignupForm/SignupForm";
-import MnemonicsComponent from "../MnemonicsComponent/MnemonicsComponent";
 import LogoutButton from "../LogoutButton/LogoutButton";
-import LocalStorageForm from "../LocalStorageForm/LocalStorageForm";
-import ThreeTierSecurityForm from "../ThreeTierSecurityForm/ThreeTierSecurityForm";
-import { useExtension } from "../../contexts/ExtensionContext";
 import KeyGen from "../KeyGen/KeyGen";
 import { refreshUser } from "../../utilities/api/users-api";
 

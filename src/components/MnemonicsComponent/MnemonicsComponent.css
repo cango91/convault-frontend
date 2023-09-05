@@ -1,11 +1,3 @@
-.mnemonics-container{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 50px;
-    transition: opacity 0.5s;
-}
-
 .mnemonics-info__text{
     text-align: center;
 }
@@ -13,7 +5,3 @@
 .mnemonics-info__h1{
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
-
-.glitch{
-    animation: glitch-animation 0.2s infinite;
-  }

@@ -5,7 +5,7 @@ import { glitch, setClassWithDelay } from "../../utilities/utils";
 
 export default function MnemonicsGrid({ mode, onNext }) {
     const [nextBtnClass, setNextBtnClass] = useState('login-btn mnemonics-next-btn invisible');
-    const [containerClass, setContainerClass] = useState("mnemonics-container invisible");
+    const [containerClass, setContainerClass] = useState("flex-ctr invisible");
     const [restartBtnClass, setRestartBtnClass] = useState('login-btn mnemonics-next-btn btn-danger d-none');
     const [instructionTxtClass, setInstructionTxtClass] = useState("glow instruction-text");
     const [nextBtnText, setNextBtnText] = useState('Next');
@@ -34,7 +34,7 @@ export default function MnemonicsGrid({ mode, onNext }) {
     /** Fade in */
     useEffect(() => {
         const timeouts = [];
-        timeouts.push(setClassWithDelay(setContainerClass, 'mnemonics-container'));
+        timeouts.push(setClassWithDelay(setContainerClass, 'flex-ctr'));
         return () => timeouts.forEach(t => clearTimeout(t));
     }, []);
     /** Update visuals for generation mode */
@@ -58,16 +58,16 @@ export default function MnemonicsGrid({ mode, onNext }) {
     /** handleNext and fade out */
     const handleNext = () => {
         if (mode === 'generation') {
-            setContainerClass('mnemonics-container invisible');
+            setContainerClass('flex-ctr invisible');
             setTimeout(() => {
-                setTimeout(() => setContainerClass('mnemonics-container'), 500);
+                setTimeout(() => setContainerClass('flex-ctr'), 500);
                 return onNext();
             }, 500);
         }
         if (mode === 'confirmation') {
             const confirmed = confirmMnemonics();
             if (confirmed) {
-                setContainerClass('mnemonics-container invisible');
+                setContainerClass('flex-ctr invisible');
                 setTimeout(() => onNext(true), 500);
             } else {
                 /** Set error message/instruction and visuals */
@@ -99,7 +99,7 @@ export default function MnemonicsGrid({ mode, onNext }) {
     /** Clear existing mnemonic for next round */
     const handleRestart = () => {
         resetMnemonic();
-        setContainerClass('mnemonics-container invisible');
+        setContainerClass('flex-ctr invisible');
         setTimeout(() => onNext(false), 500);
     }
 

@@ -8,7 +8,7 @@ import './KeyGenInfo.css';
 export default function KeyGenInfo({onUseExtension,onNext}) {
     const [checkingExtension, setCheckingExtension] = useState(true);
     const [importantClass, setImportantClass] = useState('mnemonics-info__h1 glow');
-    const [containerClass,setContainerClass] = useState('mnemonics-container mb-3 invisible');
+    const [containerClass,setContainerClass] = useState('flex-ctr mb-3 invisible');
     const [btnClass,setBtnClass] = useState('login-btn mb-3 invisible');
     const [browser, setBrowser] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
@@ -16,7 +16,7 @@ export default function KeyGenInfo({onUseExtension,onNext}) {
     // visuals
     useEffect(() => {
         const timeouts = [];
-        timeouts.push(setClassWithDelay(setContainerClass,'mnemonics-container'));
+        timeouts.push(setClassWithDelay(setContainerClass,'flex-ctr'));
         timeouts.push(setClassWithDelay(setBtnClass,'login-btn mb-3',3000));
         timeouts.push(setTimeout(() => glitch(importantClass, setImportantClass), 500));
         timeouts.push(setTimeout(() => glitch(importantClass, setImportantClass), 1500));
@@ -55,7 +55,7 @@ export default function KeyGenInfo({onUseExtension,onNext}) {
     }, [isMobile, browser,hasExtension,checkExtension]);
 
     const transitionOut = (callback,delay=500) => {
-        setContainerClass('mnemonics-container invisible');
+        setContainerClass('flex-ctr invisible');
         setTimeout(callback, delay);
     }
 

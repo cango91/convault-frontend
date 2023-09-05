@@ -6,14 +6,14 @@ import { postPublicKey, refreshUser } from "../../utilities/api/users-api";
 
 
 export default function PostPublicKey() {
-    const [containerClass, setContainerClass] = useState('mnemonics-container invisible');
+    const [containerClass, setContainerClass] = useState('flex-ctr invisible');
     const [error, setError] = useState('');
     const { exportPublicKey } = useCrypto();
     const { hasPublicKey, refreshUserToken } = useAuth();
     // visuals
     useEffect(() => {
         const timeouts = [];
-        timeouts.push(setClassWithDelay(setContainerClass, 'mnemonics-container'));
+        timeouts.push(setClassWithDelay(setContainerClass, 'flex-ctr'));
         return () => timeouts.forEach(t => clearTimeout(t));
     }, []);
 
@@ -25,7 +25,7 @@ export default function PostPublicKey() {
                 const payload = { publicKey: await exportPublicKey() }
                 const response = await postPublicKey(payload);
                 if (!response.message) {
-                    setClassWithDelay(setContainerClass, 'mnemonics-container invisible');
+                    setClassWithDelay(setContainerClass, 'flex-ctr invisible');
                     setTimeout(async () => {
                         await refreshUser();
                         refreshUserToken();

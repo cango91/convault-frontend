@@ -24,3 +24,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.flex-ctr{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px;
+  transition: opacity 0.5s;
+}
+.glitch{
+  animation: glitch-animation 0.2s infinite;
+}

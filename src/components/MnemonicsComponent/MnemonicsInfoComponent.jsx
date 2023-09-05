@@ -7,12 +7,12 @@ export default function MnemonicsInfoComponent({onNext}){
     const [dangerClass,setDangerClass] = useState('');
     const [respClass,setRespClass] = useState('');
     const [btnClass, setBtnClass] = useState('login-btn invisible');
-    const [containerClass, setContainerClass] = useState('mnemonics-container invisible');
+    const [containerClass, setContainerClass] = useState('flex-ctr invisible');
 
     useEffect(() => {
         const timeouts = [];
         glitch('', setImportantClass);
-        timeouts.push(setClassWithDelay(setContainerClass, 'mnemonics-container'));
+        timeouts.push(setClassWithDelay(setContainerClass, 'flex-ctr'));
         timeouts.push(setTimeout(() => glitch('', setTwWordsClass), 300));
         timeouts.push(setTimeout(() => glitch('', setImportantClass), 500));
         timeouts.push(setTimeout(() => glitch('', setTwWordsClass), 1100));
@@ -28,7 +28,7 @@ export default function MnemonicsInfoComponent({onNext}){
     }, []);
 
     const handleClick = () =>{
-        setContainerClass('mnemonics-container invisible');
+        setContainerClass('flex-ctr invisible');
         setTimeout(onNext,1000);
     }
 

@@ -5,14 +5,14 @@ import { useCrypto } from "../../contexts/CryptoContext";
 
 
 export default function GenerateKeys({onCompleteSignup}) {
-    const [containerClass, setContainerClass] = useState('mnemonics-container invisible');
+    const [containerClass, setContainerClass] = useState('flex-ctr invisible');
     const [nextBtnClass, setNextBtnClass] = useState('login-btn invisible');
     const [pemKey, setPemKey] = useState('');
     const { generateKeys, privateKey, exportPrivateKey } = useCrypto();
     // visuals
     useEffect(() => {
         const timeouts = [];
-        timeouts.push(setClassWithDelay(setContainerClass, 'mnemonics-container'));
+        timeouts.push(setClassWithDelay(setContainerClass, 'flex-ctr'));
 
         return () => timeouts.forEach(t => clearTimeout(t));
     }, []);
