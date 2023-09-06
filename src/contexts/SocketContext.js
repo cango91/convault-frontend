@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-import { getAccessToken, setAccessToken } from "../utilities/services/user-service";
+import { getAccessToken, refreshUserTk, setAccessToken } from "../utilities/services/user-service";
 import { refreshUser } from "../utilities/api/users-api";
 
 const SOCKET_URL = 'http://localhost:3000';
@@ -18,43 +18,45 @@ export function useSocket() {
 export function SocketProvider({ children }) {
     const [awaitAuth, setAwaitAuth] = useState(false);
     const socket = useRef(null);
-    
+
     // Initial handshake with current user token.
     useEffect(() => {
         const getFreshToken = () => new Promise(async (resolve, reject) => {
             try {
-                const response = await refreshUser();
-                setAccessToken(response.accessToken)
+                await refreshUserTk();
                 resolve(getAccessToken());
             } catch (error) {
                 reject(error);
             }
         });
-        const t = setTimeout(()=> {getFreshToken()
+        setAwaitAuth(true);
+        getFreshToken()
             .catch(console.error)
             .then(token => {
                 socket.current = io(SOCKET_URL, {
                     query: { token }
                 });
+                setAwaitAuth(false);
                 socket.current.on('reauth', () => {
                     setAwaitAuth(true);
                     getFreshToken()
-                    .catch(console.error)
-                    .then(token => {
-                        socket.current.emit('reauth', { token });
-                        setAwaitAuth(false);
-                    });     
+                        .catch(console.error)
+                        .then(token => {
+                            socket.current.emit('reauth', { token });
+                            setAwaitAuth(false);
+                        });
                 });
-            });},0);
+            });
         return () => {
-            if (socket.current)
+            if (socket.current) {
+                socket.current.off('reauth');
                 socket.current.disconnect();
-            clearTimeout(t);
+            }
         }
     }, []);
 
     return (
-        <SocketContext.Provider value={socket} >
+        <SocketContext.Provider value={{socket: socket.current, awaitAuth}} >
             {children}
         </SocketContext.Provider>
     );

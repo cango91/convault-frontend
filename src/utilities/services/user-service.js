@@ -1,3 +1,4 @@
+import { refreshUser } from "../api/users-api";
 import { parseJwt } from "../utils";
 
 export function getAccessToken(){
@@ -15,4 +16,16 @@ export function setAccessToken(token){
 export function getUser() {
     const token = getAccessToken();
     return token ? parseJwt(token).user : null;
+}
+
+export async function refreshUserTk(){
+    try {
+        const response = await  refreshUser();
+        if(response.accessToken){
+            setAccessToken(response.accessToken);
+        }
+    } catch (error) {
+        console.warn(error);
+        return;
+    }
 }
