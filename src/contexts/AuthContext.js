@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
         if (token) {
             setJwt(token);
             const user = getUser();
-            if (user.publicKey) {
+            if (user.hasPublicKey) {
                 setHasPublicKey(true);
             }
         }

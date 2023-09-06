@@ -9,17 +9,23 @@ import ExtensionAuthBridge from "../components/ExtensionAuthBridge/ExtensionAuth
 import { useCrypto } from "../contexts/CryptoContext";
 import { useEffect } from "react";
 import { base64ToArrayBuffer } from "../utilities/utils";
+import { getPublicKey } from "../utilities/api/users-api";
 export default function App() {
-    const { jwt, hasPublicKey } = useAuth();
+    const { jwt } = useAuth();
     const { importPublicKey, publicKey } = useCrypto();
-    /** If the jwt has a public key, add it to our state */
-    useEffect(() => {
-        const user = getUser();
-        if (user && user.publicKey) {
+    /** If the jwt has a hasPublicKey flag, retrieve it and import it */
+    const setPublicKey = async () =>{
+        const key = await getPublicKey();
+        if(key && key.publicKey){
             const header = "-----BEGIN PUBLIC KEY-----";
             const footer = "-----END PUBLIC KEY-----";
-            let key = user.publicKey.replace(header, "").replace(footer, "").replace(/\s+/g, "");
-            importPublicKey(base64ToArrayBuffer(key));
+            importPublicKey(base64ToArrayBuffer(key.publicKey.replace(header, "").replace(footer, "").replace(/\s+/g, "")));
+        }
+    }
+    useEffect(() => {
+        const user = getUser();
+        if (user && user.hasPublicKey) {
+            setPublicKey();
         }
     }, [jwt]);
     return (
