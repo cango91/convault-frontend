@@ -11,8 +11,8 @@
     /* pointer-events: none; */
 }
 
-@media screen and (max-width: 500px) {
+/* @media screen and (max-width: 500px) {
     .chat-component-container {
         min-width: 500px;
     }
-}
+} */

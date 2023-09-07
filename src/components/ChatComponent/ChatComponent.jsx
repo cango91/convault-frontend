@@ -1,41 +1,31 @@
-import { useCallback, useEffect, useState } from "react";
-import { useSocket } from "../../contexts/SocketContext";
-import { getAccessToken, refreshUserTk } from "../../utilities/services/user-service";
+import { useEffect, useState } from "react";
 import AsideComponent from "./Aside/AsideComponent";
 import "./ChatComponent.css";
 
-const FULLSCREEN_BREAKPOINT = "500px";
+const FULLSCREEN_BREAKPOINT = 500;
 
 export default function ChatComponent() {
     const [activeScreen,setActiveScreen] = useState('aside');
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [fullscreen, setFullscreen] = useState(false);
 
     useEffect(()=>{
-        const handleResize = () => setWindowWidth(window.innerWidth);
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
         window.addEventListener('resize', handleResize);
         return ()=> {
             window.removeEventListener('resize', handleResize);
         }
     },[]);
 
-    // const [allSessions,setAllSessions] = useState(null);
-    // const {socket} = useSocket();
-
-    // useEffect(() => {
-    //     function handleAllSessions(sessions){
-    //         setAllSessions(sessions);
-    //         console.log(sessions);
-    //     }
-    //     console.log('i got the socket');
-    //     socket.on('all-sessions',handleAllSessions);
-    //     return () => {
-    //         socket.off('all-sessions',handleAllSessions);
-    //     }
-    // },[]);
+    useEffect(()=>{
+        setFullscreen(parseInt(windowWidth,10)<=FULLSCREEN_BREAKPOINT);
+    },[windowWidth]);
 
     return (
-        <div className="chat-component-container">
-            <AsideComponent fullscreen={windowWidth <= FULLSCREEN_BREAKPOINT} active={activeScreen==='aside'} />
+        <div className={`chat-component-container`}>
+            <AsideComponent fullscreen={fullscreen} active={activeScreen==='aside'} />
         </div>
     );
 }

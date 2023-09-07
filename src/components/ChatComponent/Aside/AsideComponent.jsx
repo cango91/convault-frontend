@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../contexts/SocketContext";
 import './AsideComponent.css';
+import { refreshUserTk } from "../../../utilities/services/user-service";
 
 export default function AsideComponent({ fullscreen, active }) {
     const [sessions, setSessions] = useState(null);
     const [friends, setFriends] = useState(null);
     const [activeTab, setActiveTab] = useState('chats');
     const { socket } = useSocket();
+    const asideComponent = useRef(null);
 
     useEffect(() => {
         const handleAllSessions = (sessions) => {
+            console.log(sessions);
             setSessions(sessions);
         }
         const handleAllFriends = (friends) => {
@@ -26,6 +29,10 @@ export default function AsideComponent({ fullscreen, active }) {
 
     }, []);
 
+    useEffect(()=>{
+        refreshUserTk();
+    },[]);
+
     useEffect(() => {
         if (!friends) {
             socket.emit('send-all-friends');
@@ -35,8 +42,19 @@ export default function AsideComponent({ fullscreen, active }) {
         }
     }, [friends, sessions]);
 
+    useEffect(()=>{
+        if(!asideComponent.current) return;
+        if(fullscreen){
+            asideComponent.current.classList.add('w-100');
+            asideComponent.current.classList.remove('min-width-275');
+        }else{
+            asideComponent.current.classList.remove('w-100');
+            asideComponent.current.classList.add('min-width-275');
+        }
+    },[fullscreen]);
+
     return (
-        <aside className="aside-component">
+        <aside className="aside-component" ref={asideComponent}>
             <div className="top-bar">
                 <div className="user-profile">
                     <img src="user-filled-white.svg" alt="User" className="profile-pic" />
