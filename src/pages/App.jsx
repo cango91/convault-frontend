@@ -30,7 +30,6 @@ export default function App() {
     }, [jwt]);
     return (
         <>
-            {jwt && <WelcomeHeader username={getUser().username} />}
             <ExtensionAuthBridge />
             <Routes>
                 <Route path='/' element={<Home />} />

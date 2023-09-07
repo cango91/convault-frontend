@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { base64ToArrayBuffer, setClassWithDelay } from "../../utilities/utils";
 import { useCrypto } from "../../contexts/CryptoContext";
+import { refreshUserTk } from "../../utilities/services/user-service";
 export default function PrivKeyManual() {
     const [isMobile, setIsMobile] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
@@ -32,6 +33,7 @@ export default function PrivKeyManual() {
                 const arrayBuffer = base64ToArrayBuffer(content);
                 try {
                     await importPrivateKey(arrayBuffer);
+                    await refreshUserTk();
                 } catch (error) {
                     console.error(error);
                     showError();

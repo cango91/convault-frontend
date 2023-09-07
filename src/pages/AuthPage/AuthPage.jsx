@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import SignupComponent from '../../components/SignupComponent/SignupComponent';
 import { refreshUser } from '../../utilities/api/users-api';
+import WelcomeHeader from '../../components/WelcomeHeader/WelcomeHeader';
+import { getUser } from '../../utilities/services/user-service';
 export default function AuthPage() {
     const [showLoginPage, setShowLoginPage] = useState(true);
     const [slidingTransition, setSlidingTransition] = useState(true);
@@ -42,6 +44,7 @@ export default function AuthPage() {
 
     return (
         <main>
+            {jwt && <WelcomeHeader username={getUser().username} />}
             {
                 showLoginPage ?
                     <LoginForm inPage={!slidingTransition} />

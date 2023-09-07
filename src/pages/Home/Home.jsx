@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import './Home.css';
+import WelcomeHeader from '../../components/WelcomeHeader/WelcomeHeader';
+import { getUser } from '../../utilities/services/user-service';
 
 export default function Home() {
   const [brandTextClass, setBrandTextClass] = useState('brand-text invisible');
@@ -66,6 +68,7 @@ export default function Home() {
 
   return (
       <main className="App" onClick={handleClick}>
+        {jwt && <WelcomeHeader username={getUser().username} />}
         <header className="App-header">
           <div className="flex-container-intro">
             <h1 className={brandTextClass} onMouseLeave={glitch}>
