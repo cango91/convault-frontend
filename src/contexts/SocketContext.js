@@ -1,9 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { getAccessToken, refreshUserTk } from "../utilities/services/user-service";
-
-const SOCKET_URL = 'http://localhost:3000';
-
+import { socket } from "../socket";
 
 const SocketContext = createContext();
 
@@ -16,70 +14,50 @@ export function useSocket() {
 }
 
 export function SocketProvider({ children }) {
-    const [awaitAuth, setAwaitAuth] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
-    const socket = useRef(null);
+    const [socialEvents, setSocialEvents] = useState([]);
+    const [messageEvents, setMessageEvents] = useState([]);
 
-    // initial socket connection
     useEffect(() => {
-        async function handleReauth() {
-            setAwaitAuth(true);
-            await refreshUserTk();
-            socket.current.emit('reauth', { token: getAccessToken() });
-            setAwaitAuth(false);
-        }
-        if (!isConnected) {
-            setAwaitAuth(true);
-            const token = getAccessToken();
-            socket.current = io(SOCKET_URL, {
-                query: { token }
-            });
-            setAwaitAuth(false);
+        function onConnect() {
             setIsConnected(true);
         }
-        socket.current.on('reauth', handleReauth);
-        return () => {
-            if (isConnected && socket.current) {
-                socket.current.off('reauth', handleReauth);
-                socket.current.disconnect();
-                setIsConnected(false);
-            }
+
+        function onDisconnect() {
+            setIsConnected(false);
         }
+
+        async function onReauth() {
+            const token = await refreshUserTk();
+            socket.emit('reauth', { token });
+        }
+
+        socket.on('connect', onConnect);
+        socket.on('disconnect', onDisconnect);
+        socket.on('reauth', onReauth);
+
+        return () => {
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+            socket.off('reauth', onReauth);
+        }
+
     }, []);
 
 
 
-    // retry connection if disconnected (mainly for reconnect during dev component updates)
-    // useEffect(() => {
-    //     if (awaitAuth || isConnected || !socket.current) return;
-    //     setAwaitAuth(true);
-    //     const token = getAccessToken();
-    //     socket.current = io(SOCKET_URL, {
-    //         query: { token }
-    //     });
-    //     setAwaitAuth(false);
-    //     setIsConnected(true);
-    //     const handleReauth = async () => {
-    //         if (awaitAuth) return;
-    //         setAwaitAuth(true);
-    //         await refreshUserTk();
-    //         const token = getAccessToken();
-    //         socket.current.emit('reauth', { token });
-    //         setAwaitAuth(false);
-    //     }
-    //     socket.current.on('reauth', handleReauth);
-    //     return () => {
-    //         if (isConnected && socket.current) {
-    //             socket.current.off('reauth', handleReauth);
-    //             socket.current.disconnect();
-    //             setIsConnected(false);
-    //         }
-    //     }
-    // }, [awaitAuth, isConnected]);
+
+
+    const value = {
+        isConnected,
+        socialEvents,
+        messageEvents,
+    }
+
 
     return (
-        <SocketContext.Provider value={{ socket: socket.current, awaitAuth }} >
-            {isConnected && children}
+        <SocketContext.Provider value={value} >
+            {children}
         </SocketContext.Provider>
     );
 

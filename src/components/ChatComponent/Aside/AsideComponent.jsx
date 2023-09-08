@@ -9,40 +9,7 @@ export default function AsideComponent({ fullscreen, active }) {
     const [sessions, setSessions] = useState(null);
     const [friends, setFriends] = useState(null);
     const [activeTab, setActiveTab] = useState('chats');
-    const { socket } = useSocket();
     const asideComponent = useRef(null);
-
-    useEffect(() => {
-        const handleAllSessions = (sessions) => {
-            console.log(sessions);
-            setSessions(sessions);
-        }
-        const handleAllFriends = (friends) => {
-            setFriends(friends);
-        }
-        socket.on("all-sessions", handleAllSessions);
-        socket.on("all-friends", handleAllFriends);
-
-
-        return () => {
-            socket.off("all-sessions", handleAllSessions);
-            socket.off("all-friends", handleAllFriends);
-        };
-
-    }, []);
-
-    useEffect(()=>{
-        refreshUserTk();
-    },[]);
-
-    useEffect(() => {
-        if (!friends) {
-            socket.emit('send-all-friends');
-        }
-        if (!sessions) {
-            socket.emit('send-all-sessions');
-        }
-    }, [friends, sessions]);
 
     useEffect(()=>{
         if(!asideComponent.current) return;
