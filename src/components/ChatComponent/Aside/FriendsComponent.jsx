@@ -1,29 +1,43 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import FriendCard from './FriendCard';
+import { socket } from '../../../socket';
+import { useSocket } from '../../../contexts/SocketContext';
 
-export default function FriendsComponent({friends, onSelectFriend }) {
-    const [allFriends, setAllFriends] = useState([]);
+export default function FriendsComponent({ onSelectFriend }) {
+    // const [allFriends, setAllFriends] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [filteredFriends, setFilteredFriends] = useState([]);
     const [showInstruction, setShowInstruction] = useState(true);
+    // const [friends, setFriends] = useState([]);
+    const { allContacts } = useSocket();
+
+    // useEffect(() => {
+    //     setFriends(allContacts);
+    // }, [allContacts]);
 
     useEffect(() => {
-        if (friends) {
-            setAllFriends(friends);
-            setFilteredFriends(friends);
+        if (allContacts.length) {
+            setFilteredFriends(allContacts);
         }
-    }, [friends]);
+    }, [allContacts]);
 
     useEffect(() => {
-        const filtered = allFriends.filter((friend) =>{
-            if(!searchText) return friend;
-            return friend.username.toLowerCase().includes(searchText.toLowerCase());
+        const filtered = allContacts.filter((friend) => {
+            if (!searchText || !friend.contact) return true;
+            return friend.contact.username.toLowerCase().includes(searchText.toLowerCase());
         }
         );
         setFilteredFriends(filtered);
         setShowInstruction(searchText === '');
-    }, [searchText, allFriends]);
+    }, [searchText, allContacts]);
+
+
+    const addFriend = () => {
+        if (!searchText) return;
+        socket.emit('send-friend-request', { friendUsername: searchText });
+        setSearchText('');
+    }
 
     return (
         <div className="chat-sessions-container">
@@ -39,15 +53,17 @@ export default function FriendsComponent({friends, onSelectFriend }) {
             <div className="message-list-container">
                 <div className="message-item text-center d-flex flex-col">
                     <small className={`transition-fast ${!showInstruction ? 'invisible' : ''}`}>Type a username to send a friend request</small>
-                    <Link to="" className={`app-link transition-fast send-fr-link ${searchText && !allFriends.some((friend) => {
-                        if(!friend.username || !searchText) return false;
-                        return friend.username.toLowerCase() === searchText.toLowerCase()
-                        }) ? '' : 'invisible'}`}>
+                    <Link to=""
+                        className={`app-link transition-fast send-fr-link ${searchText && !allContacts.some((friend) => {
+                            if (!friend.contact || !searchText) return false;
+                            return friend.contact.username.toLowerCase() === searchText.toLowerCase()
+                        }) ? '' : 'invisible'}`}
+                        onClick={addFriend}>
                         Send Friend Request
                     </Link>
                 </div>
-                {filteredFriends.map((friend) => (
-                    <div className="message-item" key={friend.id}>
+                {!!filteredFriends.length && filteredFriends.map((friend,i) => (
+                    <div className="message-item" key={i}>
                         <FriendCard friend={friend} />
                     </div>
                 ))}

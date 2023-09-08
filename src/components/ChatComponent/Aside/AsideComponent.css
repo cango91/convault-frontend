@@ -5,6 +5,11 @@
     padding-right: 5px;
 }
 
+
+aside{
+    position: relative;
+}
+
 .min-width-275 {
     min-width: 275px;
 }
@@ -197,6 +202,14 @@
     position:absolute;
     width: calc(100% - 10px);
     /* left: 25% */
+}
+
+.friend-card{
+    display: flex;
+    justify-content: space-between;
+}
+.friend-card * {
+    padding: 0 5px;
 }
 
 @media screen and (min-width: 1300px) {

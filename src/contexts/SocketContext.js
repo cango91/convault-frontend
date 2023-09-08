@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import { getAccessToken, refreshUserTk } from "../utilities/services/user-service";
+import { refreshUserTk } from "../utilities/services/user-service";
 import { socket } from "../socket";
 
 const SocketContext = createContext();
@@ -15,8 +14,8 @@ export function useSocket() {
 
 export function SocketProvider({ children }) {
     const [isConnected, setIsConnected] = useState(false);
-    const [socialEvents, setSocialEvents] = useState([]);
-    const [messageEvents, setMessageEvents] = useState([]);
+    const [allContacts, setAllContacts] = useState([]);
+    const [friendRequestError, setFriendRequestError] = useState('');
 
     useEffect(() => {
         function onConnect() {
@@ -45,15 +44,84 @@ export function SocketProvider({ children }) {
     }, []);
 
 
+    /** SOCIALS */
+    useEffect(() => {
+        const getStatusValue = (item) => {
+            const { status, direction } = item.friendRequest;
+            if (status === 'pending' && direction === 'received') return 1;
+            if (status === 'accepted') return 2;
+            if (status === 'pending' && direction === 'sent') return 3;
+            if (item.blockedByContact || item.blockedContact) return 4;
+            if (status === 'rejected') return 5;
+            return 6;  // default, in case some unexpected value is in data
+        };
+
+        function onAllContacts(data) {
+            const sortedData = data.sort((a, b) => {
+                // Sort by friendRequest status & direction
+                const valA = getStatusValue(a);
+                const valB = getStatusValue(b);
+
+                if (valA !== valB) return valA - valB;
+
+                // Alphabetical sort if same category
+                return a.contact.username.localeCompare(b.contact.username);
+            });
+
+            setAllContacts(sortedData);
+        }
+
+        function onFriendRequestSent({data}) {
+            let allContactsCopy = [...allContacts];  // assuming allContacts is your state variable
+            console.log('onFriendRequestSent: ',data);
+            const insertIndex = allContactsCopy.findIndex(item => {
+                const { status, direction } = item.friendRequest;
+                if (status === 'pending' && direction === 'received') return false;  // Skip top priority items
+                if (status === 'accepted' && item.contact.username > data.contact.username) return true;  // Check for accepted status and username
+                if (status === 'pending' && direction === 'sent' && item.contact?.username > data.contact.username) return true;  // Check for pending-sent status and username
+                if (item.blockedByContact || item.blockedContact) return true;  // Check for blocked status
+                if (status === 'rejected') return true;  // Check for rejected status
+
+                return false;
+            });
+
+            if (insertIndex !== -1) {
+                allContactsCopy.splice(insertIndex, 0, data);
+            } else {
+                allContactsCopy.push(data);
+            }
+
+            console.log('all copy after req: ',allContactsCopy);
+            setAllContacts(allContactsCopy);
+            console.log('all after req: ',allContacts);
+        }
+
+        function onFriendRequestError(data) {
+            setFriendRequestError(data.message);
+        }
 
 
+        socket.on('all-contacts', onAllContacts);
+        socket.on('friend-request-sent', onFriendRequestSent);
+        socket.on('send-friend-request-error', onFriendRequestError);
+        //socket.on('friend-request-received',onFriendRequestSent);
+
+        return () => {
+            socket.off('all-contacts', onAllContacts);
+            socket.off('friend-request-sent', onFriendRequestSent);
+            socket.off('send-friend-request-error', onFriendRequestError);
+            //socket.off('friend-request-received',onFriendRequestSent);
+        }
+    },[]);
+
+    const resetFriendRequestError = () => setFriendRequestError('');
 
     const value = {
         isConnected,
-        socialEvents,
-        messageEvents,
+        allContacts,
+        friendRequestError,
+        resetFriendRequestError,
     }
-
 
     return (
         <SocketContext.Provider value={value} >
