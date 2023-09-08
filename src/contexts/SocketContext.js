@@ -71,9 +71,10 @@ export function SocketProvider({ children }) {
             setAllContacts(sortedData);
         }
 
-        function onFriendRequestSent({data}) {
-            let allContactsCopy = [...allContacts];  // assuming allContacts is your state variable
-            console.log('onFriendRequestSent: ',data);
+
+
+        function onFriendRequestSent({ data }) {
+            let allContactsCopy = [...allContacts];
             const insertIndex = allContactsCopy.findIndex(item => {
                 const { status, direction } = item.friendRequest;
                 if (status === 'pending' && direction === 'received') return false;  // Skip top priority items
@@ -90,10 +91,22 @@ export function SocketProvider({ children }) {
             } else {
                 allContactsCopy.push(data);
             }
+            setAllContacts([...allContactsCopy]);
+        }
 
-            console.log('all copy after req: ',allContactsCopy);
-            setAllContacts(allContactsCopy);
-            console.log('all after req: ',allContacts);
+        function onFriendRequestReceived({ data }) {
+            let allContactsCopy = [...allContacts];
+            const insertIndex = allContactsCopy.findIndex(item => {
+                const { status, direction } = item.friendRequest;
+                if (status === 'pending' && direction === 'received' && item.contact.username < data.contact.username) return false;
+                return true;
+            });
+            if (insertIndex !== -1) {
+                allContactsCopy.splice(insertIndex, 0, data);
+            } else {
+                allContactsCopy.push(data);
+            }
+            setAllContacts([...allContactsCopy]);
         }
 
         function onFriendRequestError(data) {
@@ -104,15 +117,15 @@ export function SocketProvider({ children }) {
         socket.on('all-contacts', onAllContacts);
         socket.on('friend-request-sent', onFriendRequestSent);
         socket.on('send-friend-request-error', onFriendRequestError);
-        //socket.on('friend-request-received',onFriendRequestSent);
+        socket.on('friend-request-received', onFriendRequestReceived);
 
         return () => {
             socket.off('all-contacts', onAllContacts);
             socket.off('friend-request-sent', onFriendRequestSent);
             socket.off('send-friend-request-error', onFriendRequestError);
-            //socket.off('friend-request-received',onFriendRequestSent);
+            socket.off('friend-request-received', onFriendRequestReceived);
         }
-    },[]);
+    }, [allContacts]);
 
     const resetFriendRequestError = () => setFriendRequestError('');
 

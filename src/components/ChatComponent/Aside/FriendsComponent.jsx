@@ -62,8 +62,8 @@ export default function FriendsComponent({ onSelectFriend }) {
                         Send Friend Request
                     </Link>
                 </div>
-                {!!filteredFriends.length && filteredFriends.map((friend,i) => (
-                    <div className="message-item" key={i}>
+                {!!filteredFriends.length && filteredFriends.map((friend) => (
+                    <div className="message-item" key={friend.friendRequest._id}>
                         <FriendCard friend={friend} />
                     </div>
                 ))}
