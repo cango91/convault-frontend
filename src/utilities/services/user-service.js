@@ -23,9 +23,11 @@ export async function refreshUserTk(){
         const response = await  refreshUser();
         if(response.accessToken){
             setAccessToken(response.accessToken);
+            return response.accessToken;
         }
+        return null;
     } catch (error) {
         console.warn(error);
-        return;
+        return null;
     }
 }

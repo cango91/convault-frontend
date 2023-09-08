@@ -1,7 +1,6 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-import { getAccessToken, refreshUserTk, setAccessToken } from "../utilities/services/user-service";
-import { refreshUser } from "../utilities/api/users-api";
+import { getAccessToken, refreshUserTk } from "../utilities/services/user-service";
 
 const SOCKET_URL = 'http://localhost:3000';
 
@@ -21,6 +20,7 @@ export function SocketProvider({ children }) {
     const [isConnected, setIsConnected] = useState(false);
     const socket = useRef(null);
 
+    // initial socket connection
     useEffect(() => {
         async function handleReauth() {
             setAwaitAuth(true);
@@ -42,9 +42,40 @@ export function SocketProvider({ children }) {
             if (isConnected && socket.current) {
                 socket.current.off('reauth', handleReauth);
                 socket.current.disconnect();
+                setIsConnected(false);
             }
         }
     }, []);
+
+
+
+    // retry connection if disconnected (mainly for reconnect during dev component updates)
+    // useEffect(() => {
+    //     if (awaitAuth || isConnected || !socket.current) return;
+    //     setAwaitAuth(true);
+    //     const token = getAccessToken();
+    //     socket.current = io(SOCKET_URL, {
+    //         query: { token }
+    //     });
+    //     setAwaitAuth(false);
+    //     setIsConnected(true);
+    //     const handleReauth = async () => {
+    //         if (awaitAuth) return;
+    //         setAwaitAuth(true);
+    //         await refreshUserTk();
+    //         const token = getAccessToken();
+    //         socket.current.emit('reauth', { token });
+    //         setAwaitAuth(false);
+    //     }
+    //     socket.current.on('reauth', handleReauth);
+    //     return () => {
+    //         if (isConnected && socket.current) {
+    //             socket.current.off('reauth', handleReauth);
+    //             socket.current.disconnect();
+    //             setIsConnected(false);
+    //         }
+    //     }
+    // }, [awaitAuth, isConnected]);
 
     return (
         <SocketContext.Provider value={{ socket: socket.current, awaitAuth }} >

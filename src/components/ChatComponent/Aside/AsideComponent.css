@@ -5,7 +5,7 @@
     padding-right: 5px;
 }
 
-.min-width-275{
+.min-width-275 {
     min-width: 275px;
 }
 
@@ -59,10 +59,13 @@
     cursor: pointer;
     color: antiquewhite;
     background-color: hsla(201, 100%, 50%, 0.3);
+    background-color: hsla(201, 25%, 49%, 0.18);
     border: none;
     margin-top: 5px;
     border-top-left-radius: 0.6rem;
     border-top-right-radius: 0.6rem;
+    font-weight: 600;
+
 }
 
 .tab.active:nth-of-type(odd) {
@@ -84,19 +87,116 @@
 
 .tab.active {
     background: hsla(201, 100%, 50%, 0.687);
+    background: hsla(201, 100%, 14%, 0.687);
     /* transition: all 0.5s; */
+    text-shadow: 0 0 1px white;
 }
 
 .dynamic-component {
     height: calc(100% - 110px);
     background: linear-gradient(to bottom, hsla(201, 100%, 50%, 0.687), hsla(201, 100%, 50%, 0.3), hsla(201, 100%, 50%, 0.3));
+    background: linear-gradient(to bottom, hsla(201, 100%, 14%, 0.687), hsla(201, 100%, 50%, 0.3), hsla(201, 100%, 50%, 0.3));
     border-bottom-left-radius: 0.6rem;
     border-bottom-right-radius: 0.6rem;
-    display:flex;
+    display: flex;
     flex-direction: column;
     padding-top: 10px;
     align-items: center;
     width: 100%;
+}
+
+
+
+.search-input {
+    box-sizing: border-box;
+    position: relative;
+    width: 90%;
+    padding-right: 2rem;
+    border-color: transparent;
+    background-color: transparent;
+    border-bottom: 1px solid white;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    text-align: start;
+}
+
+.search-input::placeholder{
+    text-align: center;
+}
+
+.chat-sessions-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.chats-component {
+    width: 100%;
+}
+
+.search-input-icon {
+    background-image: url('data:image/svg+xml;utf,<svg style="color: white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16"> <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" fill="white"></path> </svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: middle;
+    position: absolute;
+    right: 1.1rem;
+    top: 0;
+    margin-top: 10px;
+}
+
+/* .add-contact-icon{
+    background-image: url('data:image/svg+xml;utf,<svg style="color: white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16"> <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" fill="white"></path> </svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+    border-radius: 50%;
+} */
+
+/* .add-contact-icon:hover{
+    border-radius: 50%;
+    border-bottom-right-radius: 0;
+    cursor: pointer;
+    background-color: hsla(201, 100%, 50%, 0.687);
+} */
+
+.message-list-container {
+    max-width: 275px;
+    position: inherit;
+    max-height: calc(100vh - 185px);
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: darkgrey rgba(1,1,1,0);
+    margin-top: 10px;
+}
+
+.message-item{
+    padding: 10px;
+    padding-top: 0;
+}
+
+.message-item:not(:last-of-type) {
+    border-bottom: 2px solid hsla(201, 100%, 50%, 0.3);
+    border-bottom: 2px solid hsla(201, 100%, 50%, 0.3);
+}
+
+.message-list-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.message-list-container::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+}
+
+
+.send-fr-link{
+    position:absolute;
+    width: calc(100% - 10px);
+    /* left: 25% */
 }
 
 @media screen and (min-width: 1300px) {
@@ -109,51 +209,28 @@
 
 @media screen and (max-widht: 900px) {
 
-    .aside-component{
+    .aside-component {
         flex: 0 0 40%;
         max-width: 40%;
     }
 }
-.search-input{
-    box-sizing: border-box;
-    position: relative;
-    width: 90%;
-    padding-right: 2rem;
-
-}
-
-.chat-sessions-container{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-}
-
-.chats-component{
-    width: 100%;
-}
-
-.search-input-icon{
-    background-image: url('data:image/svg+xml;utf,<svg style="color: white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16"> <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" fill="white"></path> </svg>');
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 2rem;
-    height: 2rem;
-    vertical-align: middle;
-    position:absolute;
-    right: 1.1rem;
-    top:0;
-    margin-top: 10px;
-}
 
 @media screen and (max-width: 500px) {
-    .search-input-icon{
+    .search-input-icon {
         right: 1.5rem;
+    }
+
+    .message-list-container {
+        max-width: none;
     }
 }
 
 @media screen and (min-width: 1300px) {
-    .search-input-icon{
+    .search-input-icon {
         right: 1.5rem;
+    }
+
+    .message-list-container {
+        max-width: none;
     }
 }

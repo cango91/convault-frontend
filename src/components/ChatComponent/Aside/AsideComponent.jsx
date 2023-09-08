@@ -3,6 +3,7 @@ import { useSocket } from "../../../contexts/SocketContext";
 import './AsideComponent.css';
 import { refreshUserTk } from "../../../utilities/services/user-service";
 import ChatSessions from "./ChatSessions";
+import FriendsComponent from "./FriendsComponent";
 
 export default function AsideComponent({ fullscreen, active }) {
     const [sessions, setSessions] = useState(null);
@@ -83,9 +84,9 @@ export default function AsideComponent({ fullscreen, active }) {
 
             <div className="dynamic-component">
                 {activeTab === 'chats' ? (
-                    <div className="chats-component"><ChatSessions sessions={sessions} /></div>
+                    <div className="chats-component"><ChatSessions friends={friends} sessions={sessions} /></div>
                 ) : (
-                    <div className="friends-component">Friends Component</div>
+                    <div className="friends-component"><FriendsComponent friends={friends} /></div>
                 )}
             </div>
         </aside>

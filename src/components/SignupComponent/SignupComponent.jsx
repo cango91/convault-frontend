@@ -17,6 +17,7 @@ export default function SignupComponent({ setInPage }) {
         }
         ref();
     },[]);
+
     useEffect(() => {
         if(!jwt){
             setSignupStage('signup');

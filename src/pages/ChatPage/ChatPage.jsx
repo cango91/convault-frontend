@@ -11,7 +11,7 @@ export default function ChatPage() {
         <>
             <LogoutButton />
             {privateKey &&
-                <SocketProvider>
+                <SocketProvider connection={false}>
                     <ChatComponent />
                 </SocketProvider>
 
