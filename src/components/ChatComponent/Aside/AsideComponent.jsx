@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../contexts/SocketContext";
 import './AsideComponent.css';
 import { refreshUserTk } from "../../../utilities/services/user-service";
@@ -25,18 +25,18 @@ export default function AsideComponent({ fullscreen, active }) {
         }
     }, [fullscreen]);
 
-    const showError = (error) => {
+    const showError = useCallback((error) => {
         setError(error);
         setTimeout(() => {
             setError('');
             resetFriendRequestError();
-        }, 3000);
-    }
+        }, 5000);
+    });
 
     useEffect(() => {
         if (!friendRequestError) return;
         showError(friendRequestError);
-    }, [friendRequestError]);
+    }, [friendRequestError,showError]);
 
 
 
@@ -74,7 +74,7 @@ export default function AsideComponent({ fullscreen, active }) {
                     </div>
                 ) : (
                     <div className="friends-component">
-                        <FriendsComponent friends={allContacts} />
+                        <FriendsComponent onSelectFriend={(e)=>alert(e)} friends={allContacts} />
                     </div>
                 )}
             </div>

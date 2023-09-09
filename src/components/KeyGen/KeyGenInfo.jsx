@@ -68,7 +68,7 @@ export default function KeyGenInfo({onUseExtension,onNext}) {
                     <span className="glow">Convault</span> is a <span className="glow">security</span> and <span className="glow">privacy</span> oriented chat application.
                     <br />
                     As such, <span className="error-text glow-danger">we do not store</span> your private keys on our servers.
-                    <p>On the next page, you will have to save your private key file. Store this file securely. You will have to provide this file (or its contents) in each new session.</p>
+                    <p>On the next page, you will have to save your private key file. Store this file securely. You will have to provide this file in each new session.</p>
                     <button onClick={()=>transitionOut(onNext)} className={btnClass}>Continue</button>
                     <p><span className="error-text glow-danger">Warning:</span> There is no way to recover your private key if you lose it</p>
                     

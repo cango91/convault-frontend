@@ -12,8 +12,7 @@ export default function ErrorToast({ error }) {
         if (errorState) {
             timeouts.push(glitch('error-text', setErrorTextClass));
             timeouts.push(setTimeout(() => timeouts.push(glitch('error-text', setErrorTextClass)), 1000));
-            timeouts.push(setTimeout(() => timeouts.push(glitch('error-text', setErrorTextClass)), 1500));
-            timeouts.push(setTimeout(()=>setErrorState(false),3000));
+            timeouts.push(setTimeout(()=>setErrorState(false),4500));
         }
         return () => {
             timeouts.forEach(t => clearTimeout(t));
