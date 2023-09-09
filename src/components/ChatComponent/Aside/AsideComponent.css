@@ -1,17 +1,21 @@
 .aside-component {
-    min-width: 275px;
+    min-width: 350px;
     height: 100%;
     border-right: 2px solid hsla(201, 100%, 50%, 0.3);
     padding-right: 5px;
 }
 
 
-aside{
+aside {
     position: relative;
 }
 
 .min-width-275 {
     min-width: 275px;
+}
+
+.min-width-350{
+    min-width: 350px;
 }
 
 .top-bar {
@@ -99,7 +103,6 @@ aside{
 
 .dynamic-component {
     height: calc(100% - 110px);
-    background: linear-gradient(to bottom, hsla(201, 100%, 50%, 0.687), hsla(201, 100%, 50%, 0.3), hsla(201, 100%, 50%, 0.3));
     background: linear-gradient(to bottom, hsla(201, 100%, 14%, 0.687), hsla(201, 100%, 50%, 0.3), hsla(201, 100%, 50%, 0.3));
     border-bottom-left-radius: 0.6rem;
     border-bottom-right-radius: 0.6rem;
@@ -125,7 +128,7 @@ aside{
     text-align: start;
 }
 
-.search-input::placeholder{
+.search-input::placeholder {
     text-align: center;
 }
 
@@ -169,16 +172,16 @@ aside{
 } */
 
 .message-list-container {
-    max-width: 275px;
+    max-width: 350px;
     position: inherit;
     max-height: calc(100vh - 185px);
     overflow-y: scroll;
     scrollbar-width: thin;
-    scrollbar-color: darkgrey rgba(1,1,1,0);
+    scrollbar-color: darkgrey rgba(1, 1, 1, 0);
     margin-top: 10px;
 }
 
-.message-item{
+.message-item {
     padding: 10px;
     padding-top: 0;
 }
@@ -198,35 +201,66 @@ aside{
 }
 
 
-.send-fr-link{
-    position:absolute;
+.send-fr-link {
+    position: absolute;
     width: calc(100% - 10px);
     /* left: 25% */
 }
 
-.friend-card{
+.friend-card {
     display: flex;
     justify-content: space-between;
 }
-.friend-card * {
-    padding: 0 5px;
+
+.friend-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background-color: #333840ed;
+    background-color: #363f4ced;
+    background-color: #334155f7;
+    opacity: 1;
+    margin-top: 10px;
+    border: 1px solid;
+    border-radius: 0.6rem;
+    transition: all 0.1s;
 }
 
-@media screen and (min-width: 1300px) {
-
-    .aside-component {
-        flex: 0 0 30%;
-        max-width: 30%;
-    }
+.friend-card.unacknowledged{
+    border-color: limegreen;
 }
 
-@media screen and (max-widht: 900px) {
-
-    .aside-component {
-        flex: 0 0 40%;
-        max-width: 40%;
-    }
+.friend-card:hover{
+    cursor: pointer;
+    box-shadow: none;
+    transition: all 0.1s;
+    background-color: #363f4ced;
+    box-shadow: 1px 1px;
 }
+
+.friend-card:active{
+    background-color: #333840ed;
+}
+
+.status-emojis {
+    position: absolute;
+    font-size: 1.3rem;
+    border-radius: 50%;
+    transform: translateY(25%);
+    margin-left: 15px;
+}
+
+.friend-card .profile-pic {
+    object-fit: cover;
+    border: 2px solid antiquewhite;
+}
+
+.friend-username {
+    font-weight: 600;
+}
+
 
 @media screen and (max-width: 500px) {
     .search-input-icon {

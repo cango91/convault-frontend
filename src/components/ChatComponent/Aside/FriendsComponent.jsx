@@ -39,6 +39,10 @@ export default function FriendsComponent({ onSelectFriend }) {
         setSearchText('');
     }
 
+    const handleOnKeyDown = (e) => {
+        if(e.keyCode===13 && searchText) addFriend(); 
+    }
+
     return (
         <div className="chat-sessions-container">
             <input
@@ -48,6 +52,7 @@ export default function FriendsComponent({ onSelectFriend }) {
                 placeholder="search contacts"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={handleOnKeyDown}
             />
             <i className="search-input-icon"></i>
             <div className="message-list-container">

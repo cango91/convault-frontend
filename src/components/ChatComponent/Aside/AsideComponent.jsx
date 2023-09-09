@@ -18,10 +18,10 @@ export default function AsideComponent({ fullscreen, active }) {
         if (!asideComponent.current) return;
         if (fullscreen) {
             asideComponent.current.classList.add('w-100');
-            asideComponent.current.classList.remove('min-width-275');
+            asideComponent.current.classList.remove('min-width-350');
         } else {
             asideComponent.current.classList.remove('w-100');
-            asideComponent.current.classList.add('min-width-275');
+            asideComponent.current.classList.add('min-width-350');
         }
     }, [fullscreen]);
 
