@@ -9,7 +9,7 @@ export default function ChatPage() {
     const { privateKey } = useCrypto();
     return (
         <>
-            <LogoutButton /><SocketProvider>
+            <SocketProvider>
                 {privateKey &&
 
                     <ChatComponent />

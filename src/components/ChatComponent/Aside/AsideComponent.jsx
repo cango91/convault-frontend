@@ -1,18 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../contexts/SocketContext";
 import './AsideComponent.css';
-import { refreshUserTk } from "../../../utilities/services/user-service";
 import ChatSessions from "./ChatSessions";
 import FriendsComponent from "./FriendsComponent";
 import ErrorToast from "../ErrorToast";
+import WelcomeHeader from "../../WelcomeHeader/WelcomeHeader";
+import { getUser } from "../../../utilities/services/user-service";
+import { useLogout } from "../../../contexts/LogoutContext";
 
-export default function AsideComponent({ fullscreen, active }) {
+export default function AsideComponent({ fullscreen, active, onSelect }) {
     const [sessions, setSessions] = useState(null);
-    //const [friends, setFriends] = useState(null);
     const [activeTab, setActiveTab] = useState('chats');
     const [error, setError] = useState('');
+    const [isDropdownVisible, setDropdownVisible] = useState(false);
     const asideComponent = useRef(null);
-    const { allContacts, friendRequestError ,resetFriendRequestError } = useSocket();
+    const { allContacts, friendRequestError, resetFriendRequestError } = useSocket();
+    const logout = useLogout();
+    const settingsIconRef = useRef(null);
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         if (!asideComponent.current) return;
@@ -36,22 +41,66 @@ export default function AsideComponent({ fullscreen, active }) {
     useEffect(() => {
         if (!friendRequestError) return;
         showError(friendRequestError);
-    }, [friendRequestError,showError]);
+    }, [friendRequestError, showError]);
 
+    const toggleDropdown = () => {
+        setDropdownVisible(prevVisible => !prevVisible);
+    };
 
+    useEffect(() => {
+
+        const setPosition = () => {
+            if (settingsIconRef.current && dropdownRef.current && isDropdownVisible) {
+                const rect = settingsIconRef.current.getBoundingClientRect();
+                dropdownRef.current.style.left = `${rect.left}px`;
+                dropdownRef.current.style.top = `${rect.bottom}px`;
+            }
+        };
+
+        window.addEventListener('resize', setPosition);
+        setPosition();
+
+        return () => {
+            window.removeEventListener('resize', setPosition);
+        };
+    }, [isDropdownVisible]);
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+          if (settingsIconRef.current && dropdownRef.current) {
+            if (
+              !settingsIconRef.current.contains(event.target) &&
+              !dropdownRef.current.contains(event.target)
+            ) {
+              setDropdownVisible(false);
+            }
+          }
+        };
+      
+        document.addEventListener("mousedown", handleOutsideClick);
+      
+        return () => {
+          document.removeEventListener("mousedown", handleOutsideClick);
+        };
+      }, []);
 
     return (
-        <aside className="aside-component" ref={asideComponent}>
+        <aside className={`aside-component ${fullscreen && !active ? 'd-none' : fullscreen && active ? 'w-100' : ''}`} ref={asideComponent}>
             <div className="top-bar">
                 <div className="user-profile">
                     <img src="user-filled-white.svg" alt="User" className="profile-pic" />
                     <span className="status-icon"></span>
                 </div>
+                <WelcomeHeader username={getUser().username} />
 
-                <i className="settings-icon"></i>
-
+                <i className="settings-icon" ref={settingsIconRef} onClick={toggleDropdown}></i>
             </div>
-
+            {(isDropdownVisible &&
+                <div className={`dropdown dark-theme ${isDropdownVisible ? '' : 'invisible'}`} ref={dropdownRef}>
+                    {/* <div onClick={()=>alert('profile')} className="dropdown-item">Profile</div> */}
+                    <div onClick={logout} className="dropdown-item">Logout</div>
+                </div>
+            )}
             <div className="tab-selector">
                 <button
                     className={`tab ${activeTab === 'chats' ? 'active' : ''}`}
@@ -70,11 +119,11 @@ export default function AsideComponent({ fullscreen, active }) {
             <div className="dynamic-component">
                 {activeTab === 'chats' ? (
                     <div className="chats-component">
-                        <ChatSessions friends={allContacts} sessions={sessions} />
+                        <ChatSessions onSelectChat={onSelect} friends={allContacts} sessions={sessions} />
                     </div>
                 ) : (
                     <div className="friends-component">
-                        <FriendsComponent onSelectFriend={(e)=>alert(e)} friends={allContacts} />
+                        <FriendsComponent onSelectFriend={onSelect} />
                     </div>
                 )}
             </div>

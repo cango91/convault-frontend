@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { base64ToArrayBuffer, setClassWithDelay } from "../../utilities/utils";
 import { useCrypto } from "../../contexts/CryptoContext";
-import { refreshUserTk } from "../../utilities/services/user-service";
+import { getUser, refreshUserTk } from "../../utilities/services/user-service";
+import WelcomeHeader from "../WelcomeHeader/WelcomeHeader";
+import LogoutButton from "../LogoutButton/LogoutButton";
 export default function PrivKeyManual() {
     const [isMobile, setIsMobile] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
@@ -92,6 +94,7 @@ export default function PrivKeyManual() {
 
     return (
         <>
+        <LogoutButton />
             <div className="flex-ctr">
                 {
                     <div className="upload-key">

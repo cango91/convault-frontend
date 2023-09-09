@@ -7,6 +7,7 @@ import { ExtensionProvider } from './contexts/ExtensionContext';
 import App from './pages/App';
 import './index.css';
 import './components/MnemonicsComponent/MnemonicsComponent.css'; // TODO: move css to more appropriate place and rename
+import { LogoutProvider } from './contexts/LogoutContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -15,7 +16,9 @@ root.render(
       <AuthProvider>
         <CryptoProvider>
           <ExtensionProvider>
-            <App />
+            <LogoutProvider>
+              <App />
+            </LogoutProvider>
           </ExtensionProvider>
         </CryptoProvider>
       </AuthProvider>

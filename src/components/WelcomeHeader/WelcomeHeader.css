@@ -1,9 +1,10 @@
 .welcome-header-container{
     display: flex;
     position: absolute;
-    top: 20px;
     left:0;
     justify-content: center;
     width: 100%;
+    z-index: 0;
+    font-size: small;
 }
 

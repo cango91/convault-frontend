@@ -1,0 +1,57 @@
+
+.connection-indicator{
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 2px solid rgb(184, 189, 192);
+    z-index: 5000;
+}
+
+.connection-indicator:hover{
+    cursor: pointer;
+}
+
+.connection-indicator.retrying{
+    background-color: darkorange;
+}
+.connection-indicator.disconnected{
+    background-color: brown;
+}
+.connection-indicator.connected{
+    background-color: rgb(44, 165, 42);
+}
+
+.connection-indicator.connected:hover{
+    cursor: default;
+    pointer-events: none;
+}
+
+main{
+    padding: 5px;
+    min-width: 100%;
+    height: 100%;
+
+}
+
+.back-btn {
+    border-radius: 5px;
+    padding: 5px 10px;
+    background: hsla(201, 100%, 50%, 0.1);
+    border: 1px solid hsl(201, 100%, 18%);
+    outline: none;
+    color: antiquewhite;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 1s;
+}
+
+.back-btn:hover {
+    background-color: hsla(201, 100%, 50%, 0.3);
+}
+
+.back-btn:focus {
+    background-color: hsla(201, 100%, 50%, 0.5);
+}

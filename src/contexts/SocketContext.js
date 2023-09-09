@@ -131,6 +131,7 @@ export function SocketProvider({ children }) {
 
     const value = {
         isConnected,
+        setIsConnected,
         allContacts,
         friendRequestError,
         resetFriendRequestError,

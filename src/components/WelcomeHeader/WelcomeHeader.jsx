@@ -3,7 +3,6 @@ import './WelcomeHeader.css';
 
 export default function WelcomeHeader({ username }) {
     return (<>
-        <LogoutButton />
-        <div className='welcome-header-container'>Welcome, {username}</div>
+        <div className='welcome-header-container'><span className="glitch-text">Welcome, {username}</span></div>
     </>);
 }

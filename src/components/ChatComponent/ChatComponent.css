@@ -16,3 +16,8 @@
         min-width: 500px;
     }
 } */
+
+
+.vmax{
+    width: 100vmax;
+}
