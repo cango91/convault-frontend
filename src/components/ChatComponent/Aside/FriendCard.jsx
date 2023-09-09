@@ -1,19 +1,17 @@
-export default function FriendCard({friend}){
+export default function FriendCard({friend, onSelectFriend}){
     const statusEmojis = (status,direction,block=false) =>{
         if(block) return ["🛑"];
         if(status === "accepted") return ["✅"];
         if(status === "rejected") return ["❌"];
-        const ret = ["⏳"];
-        if(direction === "sent"){
-            ret.push("📬");
-        }else{
-            ret.push("📩");
-        }
-        return ret;
+        if(direction==='sent') return ["⏳"];
+        if(direction==='received') return ["📩"];
 
     }
+
+    const onFriendSelect = () => onSelectFriend(friend)
+
     return (
-        <div className="friend-card">
+        <div className="friend-card" onClick={onFriendSelect}>
             <div><img src="user-filled-white.svg" alt="User" className="profile-pic" /><span><small className="status-emojis">{friend.friendRequest?.status!=='accepted' && statusEmojis(friend.friendRequest.status,friend.friendRequest.direction,friend?.userBlocked || friend?.blockedByUser)}</small></span></div><span className="friend-username">{friend.contact?.username}</span>
         </div>
     );

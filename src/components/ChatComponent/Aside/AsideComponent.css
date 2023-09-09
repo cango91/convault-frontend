@@ -59,6 +59,7 @@ aside {
 
 .tab:hover {
     text-shadow: 0 0 8px white;
+    transition: all 0.1s;
 }
 
 .tab {

@@ -5,17 +5,10 @@ import { socket } from '../../../socket';
 import { useSocket } from '../../../contexts/SocketContext';
 
 export default function FriendsComponent({ onSelectFriend }) {
-    // const [allFriends, setAllFriends] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [filteredFriends, setFilteredFriends] = useState([]);
     const [showInstruction, setShowInstruction] = useState(true);
-    // const [friends, setFriends] = useState([]);
     const { allContacts } = useSocket();
-
-    // useEffect(() => {
-    //     setFriends(allContacts);
-    // }, [allContacts]);
-
     useEffect(() => {
         if (allContacts.length) {
             setFilteredFriends(allContacts);
@@ -69,7 +62,7 @@ export default function FriendsComponent({ onSelectFriend }) {
                 </div>
                 {!!filteredFriends.length && filteredFriends.map((friend) => (
                     <div className="message-item" key={friend.friendRequest._id}>
-                        <FriendCard friend={friend} />
+                        <FriendCard friend={friend} onSelectFriend={onSelectFriend} />
                     </div>
                 ))}
             </div>
