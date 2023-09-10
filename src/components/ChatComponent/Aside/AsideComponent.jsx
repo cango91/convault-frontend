@@ -8,7 +8,7 @@ import WelcomeHeader from "../../WelcomeHeader/WelcomeHeader";
 import { getUser } from "../../../utilities/services/user-service";
 import { useLogout } from "../../../contexts/LogoutContext";
 
-export default function AsideComponent({ fullscreen, active, onSelect, switchToChat, onSwitchedToChat }) {
+export default function AsideComponent({ fullscreen, active, onSelect, switchToChat, onSwitchedToChat, clearSelection, onClearedSelection }) {
     const [sessions, setSessions] = useState(null);
     const [activeTab, setActiveTab] = useState('chats');
     const [error, setError] = useState('');
@@ -141,7 +141,9 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
                             onSelectChat={handleSelectChat}
                             friends={allContacts}
                             sessions={sessions}
-                            selectChat={selectedChat} />
+                            selectChat={selectedChat}
+                            clearSelection={clearSelection}
+                            onClearedSelection={onClearedSelection} />
                     </div>
                 ) : (
                     <div className="friends-component">

@@ -15,6 +15,7 @@ export default function ChatComponent() {
     const [fullscreen, setFullscreen] = useState(false);
     const [asideData, setAsideData] = useState(null);
     const [switchToChat, setSwitchToChat] = useState('');
+    const [clearSelection,setClearSelection] = useState(false);
     const t = useRef(0);
     let backoff = useRef(1000);
     const { isConnected, sessionsCache, createEmptySession, markRead } = useSocket();
@@ -80,6 +81,7 @@ export default function ChatComponent() {
     const onBack = () => {
         setAsideData(null);
         setActiveScreen('aside');
+        setClearSelection(true);
     }
 
     const handleContactAction = (action, data) => {
@@ -104,6 +106,8 @@ export default function ChatComponent() {
         setSwitchToChat('');
     };
 
+    const onClearedSelection = () => setClearSelection(false);
+
 
     return (
         <>
@@ -113,7 +117,9 @@ export default function ChatComponent() {
                  fullscreen={fullscreen} 
                  active={activeScreen === 'aside'}
                  onSwitchedToChat={onSwitchedToChat}
-                 switchToChat={switchToChat} />
+                 switchToChat={switchToChat}
+                 clearSelection={clearSelection}
+                 onClearedSelection={onClearedSelection} />
                 <Main 
                 onContactAction={handleContactAction} 
                 data={asideData} 

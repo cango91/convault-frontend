@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSocket } from "../../../contexts/SocketContext";
 import { getUser } from "../../../utilities/services/user-service";
 
-export default function ChatSessions({ onSelectChat, selectChat }) {
+export default function ChatSessions({ onSelectChat, selectChat, clearSelection, onClearedSelection }) {
     const [selectedChat, setSelectedChat] = useState('');
     const { allContacts, sessionsMeta } = useSocket();
 
@@ -12,6 +12,13 @@ export default function ChatSessions({ onSelectChat, selectChat }) {
             //onSelectChat(selectedChat);
         }
     },[selectChat]);
+
+    useEffect(()=>{
+        if(!clearSelection) return;
+        setSelectedChat("");
+        onClearedSelection();
+    },[clearSelection,onClearedSelection]);
+
 
 
     const handleSelectChat = (id) => {
