@@ -49,7 +49,7 @@ export default function FriendsComponent({ onSelectFriend }) {
             />
             <i className="search-input-icon"></i>
             <div className="message-list-container">
-                <div className="message-item text-center d-flex flex-col">
+                <div className="friend-item text-center d-flex flex-col">
                     <small className={`transition-fast ${!showInstruction ? 'invisible' : ''}`}>Search by username</small>
                     <Link to=""
                         className={`app-link transition-fast send-fr-link ${searchText && !allContacts.some((friend) => {
@@ -61,7 +61,7 @@ export default function FriendsComponent({ onSelectFriend }) {
                     </Link>
                 </div>
                 {!!filteredFriends.length && filteredFriends.map((friend) => (
-                    <div className="message-item" key={friend.friendRequest._id}>
+                    <div className="friend-item" key={friend.friendRequest._id}>
                         <FriendCard friend={friend} onSelectFriend={onSelectFriend} />
                     </div>
                 ))}

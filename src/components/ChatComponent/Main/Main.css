@@ -74,7 +74,7 @@
 
 .friend-details{
     box-sizing: border-box;
-    background-color: #a8a59ff7;
+    /* background-color: #636363f7; */
     border-radius: 0.6rem;
     height: 100%;
     padding: 10px;
@@ -82,7 +82,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 5px 3px #a8a59f84;
+    min-width: 300px;
+    /* box-shadow: 0 0 5px 3px #a8a59f84; */
 }
 
 .friend-details-card {
@@ -112,3 +113,17 @@
     width: 100%;
 }
 
+.emoji-logo{
+    font-size: 90px;
+}
+
+.emoji-logo span:nth-child(1) {
+    position: relative;
+    display: inline-block;
+    transform: translateY(-25%);
+  }
+  
+  .emoji-logo span:nth-child(2) {
+    position: relative;
+    margin-left: -40px;
+  }

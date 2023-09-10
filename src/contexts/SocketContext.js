@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { refreshUserTk } from "../utilities/services/user-service";
+import { getUser, refreshUserTk } from "../utilities/services/user-service";
 import { socket } from "../socket";
 
 const SocketContext = createContext();
@@ -15,8 +15,10 @@ export function useSocket() {
 export function SocketProvider({ children }) {
     const [isConnected, setIsConnected] = useState(false);
     const [allContacts, setAllContacts] = useState([]);
-    const [allChats, setAllChats] = useState([]);
+    const [sessionsMeta, setSessionsMeta] = useState([]);
+    const [sessionsCache, setSessionsCache] = useState({});
     const [friendRequestError, setFriendRequestError] = useState('');
+    const [sendMessageError, setSendMessageError] = useState('');
 
     useEffect(() => {
         function onConnect() {
@@ -128,8 +130,6 @@ export function SocketProvider({ children }) {
             onAllContacts(allContactsCopy);
         }
 
-
-        /** SOCIALS */
         socket.on('all-contacts', onAllContacts);
         socket.on('friend-request-sent', onFriendRequestSent);
         socket.on('send-friend-request-error', onFriendRequestError);
@@ -148,21 +148,68 @@ export function SocketProvider({ children }) {
         }
     }, [allContacts]);
 
+    /** CHATS */
+
     useEffect(() => {
-        function onAllSessions(data){
-            const sortedSessions = data.sort((a,b)=>{
+        function onAllSessions(data) {
+            const sortedSessions = data.sort((a, b) => {
                 return new Date(b.updatedAt) - new Date(a.updatedAt);
             });
             console.log(data);
-            setAllChats(sortedSessions);
-        }
-        
-        function onSendMessage() {
-
+            setSessionsMeta(sortedSessions);
+            const sessions = {};
+            data.forEach(session => {
+                const id = session.user1 === getUser()._id ? session.user2 : session.user1;
+                sessions[id] = {
+                    messages: [],
+                    unreadCount: session.unreadCount,
+                    head: session.head,
+                    lastMessageDate: session.lastMessageDate,
+                };
+            });
+            setSessionsCache(sessions);
         }
 
         function onMessageSent({ data }) {
-            const sessionsCopy = []
+            if (!(data.message.recipientId in sessionsCache)) {
+                setSessionsCache(prev => ({
+                    ...prev, [data.message.recipientId]: {
+                        messages: [],
+                        unreadCount: 1,
+                    }
+                }));
+                setSessionsMeta(prev => {
+                    const newMeta = [...prev];
+                    newMeta.unshift({
+                        ...data.session,
+                        unreadCount: 1,
+                        lastMessageDate: data.message.createdAt
+                    });
+                    return newMeta;
+                });
+            }
+
+            setSessionsCache(prev => {
+                const newMessages = [...prev[data.message.recipientId].messages];
+                newMessages.unshift(data.message);
+                return {
+                    ...prev,
+                    [data.message.recipientId]: {
+                        messages: newMessages,
+                        unreadCount: prev[data.message.recipientId].unreadCount,
+                        head: data.message._id,
+                        lastMessageDate: data.message.createdAt,
+                    }
+                }
+            });
+            setSessionsMeta(prev => {
+                const newMeta = [...prev];
+                const idx = newMeta.findIndex(item => item.user1 === data.message.recipientId || item.user2 === data.message.recipientId);
+                const session = newMeta.splice(idx, 1)[0];
+                newMeta.unshift(session);
+                return newMeta;
+            });
+
         }
 
         function onMessageDelivered({ data }) {
@@ -172,15 +219,45 @@ export function SocketProvider({ children }) {
         function onMessageRead({ data }) {
 
         }
-
         function onMessageReceived({ data }) {
+            if (!(data.message.senderId in sessionsCache)) {
+                setSessionsCache(prev => ({
+                    ...prev, 
+                    [data.message.senderId]: {
+                        messages: [],
+                        unreadCount: 0,
+                    }
+                }));
+                setSessionsMeta(prev => {
+                    const newMeta = [...prev];
+                    newMeta.unshift({
+                        ...data.session,
+                        unreadCount: 1,
+                        lastMessageDate: data.message.createdAt
+                    });
+                    return newMeta;
+                });
+            }
+            setSessionsCache(prev => {
+                const newMessages = [...prev[data.message.senderId].messages];
+                newMessages.unshift(data.message)
+                return {
+                    ...prev,
+                    [data.message.senderId]: {
+                        messages: newMessages,
+                        unreadCount: prev[data.message.senderId].unreadCount + 1,
+                        head: data.message._id,
+                        lastMessageDate: data.message.createdAt,
+                    }
+                }
+            });
 
         }
 
 
         /** CHATS */
         // socket.on('send-message', onSendMessage);
-        socket.on('all-sessions',onAllSessions);
+        socket.on('all-sessions', onAllSessions);
         socket.on('message-sent', onMessageSent);
         socket.on('message-delivered', onMessageDelivered);
         socket.on('message-read', onMessageRead);
@@ -188,7 +265,7 @@ export function SocketProvider({ children }) {
 
         return () => {
             // socket.off('send-message', onSendMessage);
-            socket.off('all-sessions',onAllSessions);
+            socket.off('all-sessions', onAllSessions);
             socket.off('message-sent', onMessageSent);
             socket.off('message-delivered', onMessageDelivered);
             socket.off('message-read', onMessageRead);
@@ -196,15 +273,61 @@ export function SocketProvider({ children }) {
         }
 
 
-    }, [allChats]);
+    }, []);
 
     const resetFriendRequestError = () => setFriendRequestError('');
+    const resetSendMessageError = () => setSendMessageError('');
+    const createEmptySession = (recipientId) => {
+        if (!(recipientId in sessionsCache)) {
+            const newSession = {
+                unread: 0,
+                messages: [],
+            };
+            setSessionsCache(prev => ({ ...prev, [recipientId]: newSession }));
+            setSessionsMeta(prev => {
+                const newMeta = [...prev];
+                newMeta.unshift({
+                    user1: getUser()._id,
+                    user2: recipientId,
+                });
+                return newMeta;
+            });
+        }
+    }
+    const markRead = (senderId) => {
+        if (senderId in sessionsCache) {
+            const readMsgIds = sessionsCache[senderId].messages.filter(msg => msg.recipientId === getUser()._id && msg.status !== "read");
+            if (readMsgIds.length) {
+                socket.emit('messages-read', { ...readMsgIds });
+            }
+            setSessionsCache(prev => ({
+                ...prev,
+                [senderId]: {
+                    ...prev[senderId],
+                    unreadCount: 0
+                }
+            }));
+            const newMeta = sessionsMeta.map(item => {
+                if (item.user1 === senderId || item.user2 === senderId) {
+                    return { ...item, unreadCount: 0 }
+                }
+                return { ...item };
+            });
+            setSessionsMeta(newMeta);
+        }
+    };
 
     const value = {
         isConnected,
         allContacts,
+        sessionsCache,
+        sessionsMeta,
+        createEmptySession,
+        markRead,
+        sendMessageError,
         friendRequestError,
         resetFriendRequestError,
+        resetSendMessageError,
     }
 
     return (

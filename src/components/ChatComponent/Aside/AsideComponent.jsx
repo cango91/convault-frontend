@@ -8,11 +8,12 @@ import WelcomeHeader from "../../WelcomeHeader/WelcomeHeader";
 import { getUser } from "../../../utilities/services/user-service";
 import { useLogout } from "../../../contexts/LogoutContext";
 
-export default function AsideComponent({ fullscreen, active, onSelect }) {
+export default function AsideComponent({ fullscreen, active, onSelect, switchToChat, onSwitchedToChat }) {
     const [sessions, setSessions] = useState(null);
     const [activeTab, setActiveTab] = useState('chats');
     const [error, setError] = useState('');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
+    const [selectedChat, setSelectedChat] = useState('');
     const asideComponent = useRef(null);
     const { allContacts, friendRequestError, resetFriendRequestError } = useSocket();
     const logout = useLogout();
@@ -30,13 +31,22 @@ export default function AsideComponent({ fullscreen, active, onSelect }) {
         }
     }, [fullscreen]);
 
+    useEffect(() => {
+        if (!switchToChat) return;
+        if (switchToChat) {
+            setActiveTab('chats');
+            setSelectedChat(switchToChat);
+        }
+        onSwitchedToChat();
+    }, [switchToChat, onSwitchedToChat]);
+
     const showError = useCallback((error) => {
         setError(error);
         setTimeout(() => {
             setError('');
             resetFriendRequestError();
         }, 5000);
-    },[]);
+    }, []);
 
     useEffect(() => {
         if (!friendRequestError) return;
@@ -67,22 +77,28 @@ export default function AsideComponent({ fullscreen, active, onSelect }) {
 
     useEffect(() => {
         const handleOutsideClick = (event) => {
-          if (settingsIconRef.current && dropdownRef.current) {
-            if (
-              !settingsIconRef.current.contains(event.target) &&
-              !dropdownRef.current.contains(event.target)
-            ) {
-              setDropdownVisible(false);
+            if (settingsIconRef.current && dropdownRef.current) {
+                if (
+                    !settingsIconRef.current.contains(event.target) &&
+                    !dropdownRef.current.contains(event.target)
+                ) {
+                    setDropdownVisible(false);
+                }
             }
-          }
         };
-      
+
         document.addEventListener("mousedown", handleOutsideClick);
-      
+
         return () => {
-          document.removeEventListener("mousedown", handleOutsideClick);
+            document.removeEventListener("mousedown", handleOutsideClick);
         };
-      }, []);
+    }, []);
+
+    const handleSelectChat = (id) => {
+        setSelectedChat('');
+        onSelect('chat', id);
+
+    }
 
     return (
         <aside className={`aside-component ${fullscreen && !active ? 'd-none' : fullscreen && active ? 'w-100' : ''}`} ref={asideComponent}>
@@ -119,7 +135,11 @@ export default function AsideComponent({ fullscreen, active, onSelect }) {
             <div className="dynamic-component">
                 {activeTab === 'chats' ? (
                     <div className="chats-component">
-                        <ChatSessions onSelectChat={onSelect} friends={allContacts} sessions={sessions} />
+                        <ChatSessions
+                            onSelectChat={handleSelectChat}
+                            friends={allContacts}
+                            sessions={sessions}
+                            selectChat={selectedChat} />
                     </div>
                 ) : (
                     <div className="friends-component">

@@ -13,9 +13,10 @@ export default function ChatComponent() {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [fullscreen, setFullscreen] = useState(false);
     const [asideData, setAsideData] = useState(null);
+    const [switchToChat, setSwitchToChat] = useState('');
     const t = useRef(0);
     let backoff = useRef(1000);
-    const { isConnected } = useSocket();
+    const { isConnected, sessionsCache, createEmptySession, markRead } = useSocket();
 
     useEffect(() => {
         socket.io.opts.query = { token: getAccessToken() };
@@ -87,18 +88,35 @@ export default function ChatComponent() {
                 break;
             case 'chat':
                 // find an existing chat . If no existing chat, set a temporary one
+                setSwitchToChat(data.contact._id);
+                if(!(data.contact._id in sessionsCache)){
+                    createEmptySession(data.contact._id);
+                }
+                setActiveScreen('main');
                 break;
             default:
                 return;
         }
     }
 
+    const onSwitchedToChat = () => setSwitchToChat('');
+
 
     return (
         <>
             <div className={`chat-component-container ${!fullscreen ? 'vmax' : ''}`}>
-                <AsideComponent onSelect={onSelectAside} fullscreen={fullscreen} active={activeScreen === 'aside'} />
-                <Main onContactAction={handleContactAction} data={asideData} onBack={onBack} fullscreen={fullscreen} active={activeScreen === 'main'} />
+                <AsideComponent
+                 onSelect={onSelectAside} 
+                 fullscreen={fullscreen} 
+                 active={activeScreen === 'aside'}
+                 onSwitchedToChat={onSwitchedToChat}
+                 switchToChat={switchToChat} />
+                <Main 
+                onContactAction={handleContactAction} 
+                data={asideData} 
+                onBack={onBack} 
+                fullscreen={fullscreen} 
+                active={activeScreen === 'main'} />
             </div>
 
         </>
