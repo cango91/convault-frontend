@@ -9,7 +9,7 @@ export default function ChatSessions({ onSelectChat, selectChat }) {
     useEffect(()=>{
         if(selectChat){
             setSelectedChat(selectChat);
-            onSelectChat(selectedChat);
+            //onSelectChat(selectedChat);
         }
     },[selectChat]);
 

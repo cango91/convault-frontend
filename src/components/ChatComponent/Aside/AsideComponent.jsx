@@ -20,6 +20,11 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
     const settingsIconRef = useRef(null);
     const dropdownRef = useRef(null);
 
+    const handleSelectChat = (id) => {
+        setSelectedChat('');
+        onSelect(id);
+    }
+
     useEffect(() => {
         if (!asideComponent.current) return;
         if (fullscreen) {
@@ -37,8 +42,9 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
             setActiveTab('chats');
             setSelectedChat(switchToChat);
         }
-        onSwitchedToChat();
-    }, [switchToChat, onSwitchedToChat]);
+        onSelect(switchToChat)
+        onSwitchedToChat(switchToChat);
+    }, [switchToChat, onSwitchedToChat,onSelect]);
 
     const showError = useCallback((error) => {
         setError(error);
@@ -94,11 +100,7 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
         };
     }, []);
 
-    const handleSelectChat = (id) => {
-        setSelectedChat('');
-        onSelect('chat', id);
 
-    }
 
     return (
         <aside className={`aside-component ${fullscreen && !active ? 'd-none' : fullscreen && active ? 'w-100' : ''}`} ref={asideComponent}>

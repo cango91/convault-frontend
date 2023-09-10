@@ -6,6 +6,7 @@ import { getAccessToken } from "../../utilities/services/user-service";
 import { useSocket } from "../../contexts/SocketContext";
 import Main from "./Main/Main";
 
+
 const FULLSCREEN_BREAKPOINT = 500;
 
 export default function ChatComponent() {
@@ -99,7 +100,9 @@ export default function ChatComponent() {
         }
     }
 
-    const onSwitchedToChat = () => setSwitchToChat('');
+    const onSwitchedToChat = (id) => {
+        setSwitchToChat('');
+    };
 
 
     return (
