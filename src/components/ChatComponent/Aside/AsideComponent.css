@@ -175,7 +175,7 @@ aside {
 } */
 
 .message-list-container {
-    max-width: 350px;
+    min-width: 350px;
     position: inherit;
     max-height: calc(100vh - 185px);
     overflow-y: scroll;
@@ -221,14 +221,13 @@ aside {
     align-items: center;
     gap: 10px;
     padding: 12px;
-    background-color: #333840ed;
-    background-color: #363f4ced;
     background-color: #334155f7;
     opacity: 1;
     margin-top: 10px;
     border: 1px solid;
     border-radius: 0.6rem;
     transition: all 0.1s;
+    color: white;
 }
 
 .friend-card.unacknowledged{
@@ -275,6 +274,8 @@ aside {
     transition: all 0.1s;
     border: 1px solid antiquewhite;
     z-index: 5;
+    border-radius: 0.6rem;
+    border-top-right-radius: 0;
   }
 
   .dropdown-item{

@@ -53,6 +53,9 @@ code {
 .transition-fast {
   transition: all 0.5s;
 }
+.transition-none {
+  transition: none;
+}
 
 .invisible:hover {
   cursor: default;
@@ -134,6 +137,18 @@ code {
 .btn-danger:focus {
   background: hsla(0, 100%, 31%, 0.585);
   border: 1px solid hsl(0, 100%, 18%);
+}
+.btn-success {
+  background: hsla(120, 100%, 20%, 0.28);
+  border: 1px solid hsl(97, 100%, 41%);
+}
+
+.btn-success:hover {
+  background: hsla(120, 100%, 20%, 0.585);
+}
+
+.btn-success:focus {
+  background: hsla(120, 100%, 31%, 0.585);
 }
 
 .error-text {

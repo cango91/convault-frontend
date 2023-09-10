@@ -36,7 +36,7 @@ export default function AsideComponent({ fullscreen, active, onSelect }) {
             setError('');
             resetFriendRequestError();
         }, 5000);
-    });
+    },[]);
 
     useEffect(() => {
         if (!friendRequestError) return;

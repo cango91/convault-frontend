@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { refreshUserTk } from "../utilities/services/user-service";
 import { socket } from "../socket";
 
@@ -15,6 +15,7 @@ export function useSocket() {
 export function SocketProvider({ children }) {
     const [isConnected, setIsConnected] = useState(false);
     const [allContacts, setAllContacts] = useState([]);
+    const [allChats, setAllChats] = useState([]);
     const [friendRequestError, setFriendRequestError] = useState('');
 
     useEffect(() => {
@@ -44,7 +45,7 @@ export function SocketProvider({ children }) {
     }, []);
 
 
-    /** SOCIALS */
+    /** SOCIALS AND CHATS */
     useEffect(() => {
         const getStatusValue = (item) => {
             const { status, direction } = item.friendRequest;
@@ -113,25 +114,94 @@ export function SocketProvider({ children }) {
             setFriendRequestError(data.message);
         }
 
+        function onFriendRequestAccepted({ data }) {
+            const allContactsCopy = [...allContacts];
+            const itemIdx = allContactsCopy.findIndex(item => item.friendRequest._id === data.friendRequest._id);
+            allContactsCopy[itemIdx].friendRequest = {
+                ...allContactsCopy[itemIdx].friendRequest,
+                ...data.friendRequest
+            };
+            allContactsCopy[itemIdx].contact = {
+                ...allContactsCopy[itemIdx].contact,
+                ...data.contact
+            };
+            onAllContacts(allContactsCopy);
+        }
 
+
+        /** SOCIALS */
         socket.on('all-contacts', onAllContacts);
         socket.on('friend-request-sent', onFriendRequestSent);
         socket.on('send-friend-request-error', onFriendRequestError);
         socket.on('friend-request-received', onFriendRequestReceived);
+        socket.on('friend-request-accepted', onFriendRequestAccepted);
+
+
 
         return () => {
             socket.off('all-contacts', onAllContacts);
             socket.off('friend-request-sent', onFriendRequestSent);
             socket.off('send-friend-request-error', onFriendRequestError);
             socket.off('friend-request-received', onFriendRequestReceived);
+            socket.off('friend-request-accepted', onFriendRequestAccepted);
+
         }
     }, [allContacts]);
+
+    useEffect(() => {
+        function onAllSessions(data){
+            const sortedSessions = data.sort((a,b)=>{
+                return new Date(b.updatedAt) - new Date(a.updatedAt);
+            });
+            console.log(data);
+            setAllChats(sortedSessions);
+        }
+        
+        function onSendMessage() {
+
+        }
+
+        function onMessageSent({ data }) {
+            const sessionsCopy = []
+        }
+
+        function onMessageDelivered({ data }) {
+
+        }
+
+        function onMessageRead({ data }) {
+
+        }
+
+        function onMessageReceived({ data }) {
+
+        }
+
+
+        /** CHATS */
+        // socket.on('send-message', onSendMessage);
+        socket.on('all-sessions',onAllSessions);
+        socket.on('message-sent', onMessageSent);
+        socket.on('message-delivered', onMessageDelivered);
+        socket.on('message-read', onMessageRead);
+        socket.on('message-received', onMessageReceived);
+
+        return () => {
+            // socket.off('send-message', onSendMessage);
+            socket.off('all-sessions',onAllSessions);
+            socket.off('message-sent', onMessageSent);
+            socket.off('message-delivered', onMessageDelivered);
+            socket.off('message-read', onMessageRead);
+            socket.off('message-received', onMessageReceived);
+        }
+
+
+    }, [allChats]);
 
     const resetFriendRequestError = () => setFriendRequestError('');
 
     const value = {
         isConnected,
-        setIsConnected,
         allContacts,
         friendRequestError,
         resetFriendRequestError,

@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useCrypto } from "../../contexts/CryptoContext";
 import { useExtension } from "../../contexts/ExtensionContext";
 import { glitch, setClassWithDelay } from "../../utilities/utils";
 import './KeyGenInfo.css';

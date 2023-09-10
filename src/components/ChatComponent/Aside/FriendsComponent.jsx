@@ -50,7 +50,7 @@ export default function FriendsComponent({ onSelectFriend }) {
             <i className="search-input-icon"></i>
             <div className="message-list-container">
                 <div className="message-item text-center d-flex flex-col">
-                    <small className={`transition-fast ${!showInstruction ? 'invisible' : ''}`}>Type a username to send a friend request</small>
+                    <small className={`transition-fast ${!showInstruction ? 'invisible' : ''}`}>Search by username</small>
                     <Link to=""
                         className={`app-link transition-fast send-fr-link ${searchText && !allContacts.some((friend) => {
                             if (!friend.contact || !searchText) return false;
