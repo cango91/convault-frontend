@@ -7,6 +7,7 @@ import ErrorToast from "../ErrorToast";
 import WelcomeHeader from "../../WelcomeHeader/WelcomeHeader";
 import { getUser } from "../../../utilities/services/user-service";
 import { useLogout } from "../../../contexts/LogoutContext";
+import ConnectionIndicator from "../Main/ConnectionIndicator";
 
 export default function AsideComponent({ fullscreen, active, onSelect, switchToChat, onSwitchedToChat, clearSelection, onClearedSelection }) {
     const [sessions, setSessions] = useState(null);
@@ -109,8 +110,8 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
                     <img src="user-filled-white.svg" alt="User" className="profile-pic" />
                     <span className="status-icon"></span>
                 </div>
-                <WelcomeHeader username={getUser().username} />
-
+                <div className="connection-indicator-container"><WelcomeHeader noWelcome={true} username={getUser().username} position="relative" /><ConnectionIndicator /></div>
+                
                 <i className="settings-icon" ref={settingsIconRef} onClick={toggleDropdown}></i>
             </div>
             {(isDropdownVisible &&

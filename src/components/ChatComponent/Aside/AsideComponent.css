@@ -175,8 +175,8 @@ aside {
     padding-top: 0;
 }
 
-.friend-item{
-    padding:10px;
+.friend-item {
+    padding: 10px;
     padding-top: 0;
 }
 
@@ -251,8 +251,8 @@ aside {
     background-color: hsla(200, 20%, 18%, 0.99);
 }
 
-.chat-meta.active{
-    background-color:hsla(198, 7%, 27%, 0.99) ;
+.chat-meta.active {
+    background-color: hsla(198, 7%, 27%, 0.99);
 }
 
 /* .chat-meta:first-of-type{
@@ -403,29 +403,85 @@ aside {
     font-weight: 600;
 }
 
-.dropdown.dark-theme {
+.dropdown {
     background-color: #333;
     color: #fff;
     position: absolute;
     min-width: 75px;
-    padding: 10px;
-    transform: translateX(-110%) translateY(-25%);
+    padding: 10px 0;
+    /* transform: translateX(-110%) translateY(-25%); */
+    transform:  translateX(-55%);
     opacity: 1;
     transition: all 0.1s;
     border: 1px solid antiquewhite;
     z-index: 5;
     border-radius: 0.6rem;
-    border-top-right-radius: 0;
+    box-shadow: 0 0 3px 1px;
+    box-sizing: border-box;
+    /* border-top-left-radius: 0; */
+}
+
+.dropdown::after {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: calc(50% - 10px);
+    width: 0;
+    height: 0;
+    transform: rotateZ(-90deg);
+    border: 10px solid transparent;
+    border-left-color: antiquewhite;
+    border-top-left-radius: 0;
+    z-index: -1;
 }
 
 .dropdown-item {
-    text-align: end;
-    padding: 5px;
+    text-align: center;
+    padding: 5px 10px;
 }
 
 .dropdown-item:hover {
-    background-color: #282424;
+    background-color: #514b4b;
     cursor: pointer;
+
+}
+.connection-indicator-container{
+    display: flex;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    gap: 10px;
+    align-items: center;
+    vertical-align:middle;
+}
+
+.connection-indicator{
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    border: 2px solid rgb(184, 189, 192);
+    z-index: 10;
+    justify-self: flex-end;
+    position: relative;
+    min-width: 10px;
+}
+
+.connection-indicator:hover{
+    cursor: pointer;
+}
+
+.connection-indicator.retrying{
+    background-color: darkorange;
+}
+.connection-indicator.disconnected{
+    background-color: brown;
+}
+.connection-indicator.connected{
+    background-color: rgb(44, 165, 42);
+}
+
+.connection-indicator.connected:hover{
+    cursor: default;
+    pointer-events: none;
 }
 
 

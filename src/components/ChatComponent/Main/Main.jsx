@@ -20,7 +20,7 @@ export default function Main({ fullscreen, active, onBack, data, onContactAction
                         <img src='user-filled-white.svg' alt="" className='profile-pic' />
                         <span className='friend-username'>{username}</span>
                     </div>
-                    <ConnectionIndicator />
+                    
                 </div>
                 <div className="theater">
                     {
