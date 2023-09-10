@@ -14,7 +14,7 @@ export default function Main({ fullscreen, active, onBack, data, onContactAction
     return (
         <>
             <main className={`main ${fullscreen && !active ? 'd-none' : ''}`}>
-                <div className="top-bar">
+                <div className="top-bar info">
                 <button onClick={onBack} className={`back-btn  ${fullscreen && active ? '' : 'd-none'}`}>←Back</button>
                     <div className={`chat-info ${!data || data.friendRequest ? 'invisible' : ''}`}>
                         <img src='user-filled-white.svg' alt="" className='profile-pic' />

@@ -51,6 +51,7 @@
 
 .main{
     padding: 5px;
+    padding-top: 0;
     position: relative;
     width: 100%;
     height: 100%;
@@ -122,10 +123,17 @@
     margin-left: -40px;
   }
 
+  .top-bar.info{
+    box-sizing: border-box;
+    padding-bottom: 5px;
+
+  }
+
   .chat-info{
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    gap:10px;
   }
 
   .chat-info .profile-pic{
