@@ -4,26 +4,35 @@ import { getUser } from "../../../utilities/services/user-service";
 
 export default function ChatSessions({ onSelectChat, selectChat, clearSelection, onClearedSelection }) {
     const [selectedChat, setSelectedChat] = useState('');
-    const { allContacts, sessionsMeta } = useSocket();
+    const [sessionsMeta, setSessionsMeta] = useState([]);
+    const { allContacts, sessionsCache, clearEmptySessions } = useSocket();
 
-    useEffect(()=>{
-        if(selectChat){
+    useEffect(() => {
+        if (selectChat) {
             setSelectedChat(selectChat);
             //onSelectChat(selectedChat);
         }
-    },[selectChat]);
+    }, [selectChat]);
 
-    useEffect(()=>{
-        if(!clearSelection) return;
+    useEffect(() => {
+        if (!clearSelection) return;
         setSelectedChat("");
         onClearedSelection();
-    },[clearSelection,onClearedSelection]);
+    }, [clearSelection, onClearedSelection]);
+
+    useEffect(() => {
+        setSessionsMeta(prev => {
+            const friendIds = Object.keys(sessionsCache);
+            return friendIds.map(id => sessionsCache[id].session).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        });
+    }, [sessionsCache]);
 
 
 
     const handleSelectChat = (id) => {
         setSelectedChat(id);
         onSelectChat(id);
+        clearEmptySessions();
     }
 
 
@@ -51,7 +60,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                         const username = allContacts.find(item => item.contact._id === userId).contact.username;
                         return (
                             <div className={`message-item`}
-                                key={userId}
+                                key={`meta_${username}`}
                             ><div className={`chat-meta ${selectedChat === userId ? 'active' : ''}`} onClick={() => handleSelectChat(userId)}>
                                     <div className="chat-meta__profile-pic">
                                         <img src="user-filled-white.svg" className="profile-pic" alt="profile pic" />
@@ -65,7 +74,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                                             </div>
                                             <div className="chat-meta__sup__date_div">
                                                 <span className="chat-meta__sup__date_span">
-                                                    {session?.lastMessageDate || 'N/A'}
+                                                    {(session?.updatedAt ? new Date(session.updatedAt).toLocaleString() : '') || 'N/A'}
                                                 </span>
                                             </div>
                                         </div>

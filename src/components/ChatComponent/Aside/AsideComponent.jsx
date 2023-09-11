@@ -9,14 +9,13 @@ import { getUser } from "../../../utilities/services/user-service";
 import { useLogout } from "../../../contexts/LogoutContext";
 import ConnectionIndicator from "../Main/ConnectionIndicator";
 
-export default function AsideComponent({ fullscreen, active, onSelect, switchToChat, onSwitchedToChat, clearSelection, onClearedSelection }) {
-    const [sessions, setSessions] = useState(null);
+export default function AsideComponent({ fullscreen, active, onSelect, switchToChat, onSwitchedToChat, clearSelection, onClearedSelection, onTabSwitched }) {
     const [activeTab, setActiveTab] = useState('chats');
     const [error, setError] = useState('');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [selectedChat, setSelectedChat] = useState('');
     const asideComponent = useRef(null);
-    const { allContacts, friendRequestError, resetFriendRequestError } = useSocket();
+    const { allContacts, friendRequestError, resetFriendRequestError, clearEmptySessions } = useSocket();
     const logout = useLogout();
     const settingsIconRef = useRef(null);
     const dropdownRef = useRef(null);
@@ -37,6 +36,14 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
         }
     }, [fullscreen]);
 
+    /** Tabs Switched */
+    const handleTabSwitch = (tab) => {
+        setActiveTab(tab);
+        clearEmptySessions();
+        onTabSwitched();
+    }
+
+    /** Switch to Chat */
     useEffect(() => {
         if (!switchToChat) return;
         if (switchToChat) {
@@ -45,8 +52,10 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
         }
         onSelect(switchToChat)
         onSwitchedToChat(switchToChat);
-    }, [switchToChat, onSwitchedToChat,onSelect]);
+    }, [switchToChat, onSwitchedToChat, onSelect]);
 
+
+    /** Error display */
     const showError = useCallback((error) => {
         setError(error);
         setTimeout(() => {
@@ -55,11 +64,14 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
         }, 5000);
     }, []);
 
+
     useEffect(() => {
         if (!friendRequestError) return;
         showError(friendRequestError);
     }, [friendRequestError, showError]);
 
+
+    /** Dropdown */
     const toggleDropdown = () => {
         setDropdownVisible(prevVisible => !prevVisible);
     };
@@ -111,7 +123,7 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
                     <span className="status-icon"></span>
                 </div>
                 <div className="connection-indicator-container"><WelcomeHeader noWelcome={true} username={getUser().username} position="relative" /><ConnectionIndicator /></div>
-                
+
                 <i className="settings-icon" ref={settingsIconRef} onClick={toggleDropdown}></i>
             </div>
             {(isDropdownVisible &&
@@ -123,13 +135,13 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
             <div className="tab-selector">
                 <button
                     className={`tab ${activeTab === 'chats' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('chats')}
+                    onClick={() => handleTabSwitch('chats')}
                 >
                     Chats
                 </button>
                 <button
                     className={`tab ${activeTab === 'friends' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('friends')}
+                    onClick={() => handleTabSwitch('friends')}
                 >
                     Friends
                 </button>
@@ -141,7 +153,6 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
                         <ChatSessions
                             onSelectChat={handleSelectChat}
                             friends={allContacts}
-                            sessions={sessions}
                             selectChat={selectedChat}
                             clearSelection={clearSelection}
                             onClearedSelection={onClearedSelection} />

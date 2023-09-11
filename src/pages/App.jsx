@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./Home/Home";
 import AuthPage from "./AuthPage/AuthPage";
 import ChatPage from "./ChatPage/ChatPage";
-import WelcomeHeader from "../components/WelcomeHeader/WelcomeHeader";
 import { useAuth } from "../contexts/AuthContext";
 import { getUser } from "../utilities/services/user-service";
 import ExtensionAuthBridge from "../components/ExtensionAuthBridge/ExtensionAuthBridge";

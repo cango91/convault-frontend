@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import ChatArea from './ChatArea/ChatArea';
-import ConnectionIndicator from './ConnectionIndicator';
 import FriendDetails from './FriendDetails/FriendDetails';
 import './Main.css';
 import { useSocket } from '../../../contexts/SocketContext';

@@ -1,4 +1,3 @@
-import LogoutButton from '../LogoutButton/LogoutButton';
 import './WelcomeHeader.css';
 
 export default function WelcomeHeader({ username, position, noWelcome }) {

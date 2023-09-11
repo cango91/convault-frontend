@@ -15,10 +15,10 @@ export default function ChatComponent() {
     const [fullscreen, setFullscreen] = useState(false);
     const [asideData, setAsideData] = useState(null);
     const [switchToChat, setSwitchToChat] = useState('');
-    const [clearSelection,setClearSelection] = useState(false);
+    const [clearSelection, setClearSelection] = useState(false);
     const t = useRef(0);
     let backoff = useRef(1000);
-    const { isConnected, sessionsCache, createEmptySession, markRead } = useSocket();
+    const { isConnected, sessionsCache, createEmptySession, markRead, sessionsMeta } = useSocket();
 
     useEffect(() => {
         socket.io.opts.query = { token: getAccessToken() };
@@ -46,7 +46,7 @@ export default function ChatComponent() {
         function onConnect() {
             clearTimeout(t.current);
             backoff.current = 1000;
-            console.log("connection established");
+            console.info("connection established");
             // setRetrying(false);
         }
         socket.on('disconnect', onDisconnect);
@@ -92,7 +92,7 @@ export default function ChatComponent() {
             case 'chat':
                 // find an existing chat . If no existing chat, set a temporary one
                 setSwitchToChat(data.contact._id);
-                if(!(data.contact._id in sessionsCache)){
+                if (!(data.contact._id in sessionsCache) || !sessionsMeta.find(s => s.user1 === data.contact._id || s.user2 === data.contact._id)) {
                     createEmptySession(data.contact._id);
                 }
                 setActiveScreen('main');
@@ -107,25 +107,32 @@ export default function ChatComponent() {
     };
 
     const onClearedSelection = () => setClearSelection(false);
+    const onTabSwitched = () => {
+        if (!switchToChat) {
+            setAsideData(null);
+            setActiveScreen('aside');
+        }
+    }
 
 
     return (
         <>
             <div className={`chat-component-container ${!fullscreen ? 'vmax' : ''}`}>
                 <AsideComponent
-                 onSelect={onSelectAside} 
-                 fullscreen={fullscreen} 
-                 active={activeScreen === 'aside'}
-                 onSwitchedToChat={onSwitchedToChat}
-                 switchToChat={switchToChat}
-                 clearSelection={clearSelection}
-                 onClearedSelection={onClearedSelection} />
-                <Main 
-                onContactAction={handleContactAction} 
-                data={asideData} 
-                onBack={onBack} 
-                fullscreen={fullscreen} 
-                active={activeScreen === 'main'} />
+                    onSelect={onSelectAside}
+                    fullscreen={fullscreen}
+                    active={activeScreen === 'aside'}
+                    onTabSwitched={onTabSwitched}
+                    onSwitchedToChat={onSwitchedToChat}
+                    switchToChat={switchToChat}
+                    clearSelection={clearSelection}
+                    onClearedSelection={onClearedSelection} />
+                <Main
+                    onContactAction={handleContactAction}
+                    data={asideData}
+                    onBack={onBack}
+                    fullscreen={fullscreen}
+                    active={activeScreen === 'main'} />
             </div>
 
         </>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getUser, refreshUserTk } from "../utilities/services/user-service";
 import { socket } from "../socket";
 
@@ -15,7 +15,7 @@ export function useSocket() {
 export function SocketProvider({ children }) {
     const [isConnected, setIsConnected] = useState(false);
     const [allContacts, setAllContacts] = useState([]);
-    const [sessionsMeta, setSessionsMeta] = useState([]);
+    // const [sessionsMeta, setSessionsMeta] = useState([]);
     const [sessionsCache, setSessionsCache] = useState({});
     const [friendRequestError, setFriendRequestError] = useState('');
     const [sendMessageError, setSendMessageError] = useState('');
@@ -150,67 +150,58 @@ export function SocketProvider({ children }) {
 
     /** CHATS */
 
+
     useEffect(() => {
         function onAllSessions(data) {
+            console.log('got all sessions:',data)
             const sortedSessions = data.sort((a, b) => {
                 return new Date(b.updatedAt) - new Date(a.updatedAt);
             });
-            console.log(data);
-            setSessionsMeta(sortedSessions);
             const sessions = {};
-            data.forEach(session => {
+            sortedSessions.forEach(session => {
                 const id = session.user1 === getUser()._id ? session.user2 : session.user1;
                 sessions[id] = {
                     messages: [],
                     unreadCount: session.unreadCount,
                     head: session.head,
                     lastMessageDate: session.lastMessageDate,
+                    session: session
                 };
             });
             setSessionsCache(sessions);
         }
 
         function onMessageSent({ data }) {
+            console.log('message-setn data: ', data);
+            console.log('at the time, the cache', sessionsCache);
             if (!(data.message.recipientId in sessionsCache)) {
+                console.log('reporting from message sent, problem')
                 setSessionsCache(prev => ({
-                    ...prev, [data.message.recipientId]: {
-                        messages: [],
-                        unreadCount: 1,
-                    }
-                }));
-                setSessionsMeta(prev => {
-                    const newMeta = [...prev];
-                    newMeta.unshift({
-                        ...data.session,
-                        unreadCount: 1,
-                        lastMessageDate: data.message.createdAt
-                    });
-                    return newMeta;
-                });
-            }
-
-            setSessionsCache(prev => {
-                const newMessages = [...prev[data.message.recipientId].messages];
-                newMessages.unshift(data.message);
-                return {
                     ...prev,
                     [data.message.recipientId]: {
-                        messages: newMessages,
-                        unreadCount: prev[data.message.recipientId].unreadCount,
-                        head: data.message._id,
-                        lastMessageDate: data.message.createdAt,
+                        messages: [data.message],
+                        unreadCount: 1,
+                        session: data.session,
+                    },
+                }));
+            } else {
+                setSessionsCache(prev => {
+                    const key = data.message.recipientId;
+                    const messages = [data.message].concat(prev[key].messages);
+                    console.log(`message sent reporting:`,messages);
+                    return {
+                        ...prev,
+                        [key]: {
+                            ...prev[key],
+                            messages,
+                            unreadCount: prev[key].unreadCount + 1,
+                            session: data.session,
+                        }
                     }
-                }
-            });
-            setSessionsMeta(prev => {
-                const newMeta = [...prev];
-                const idx = newMeta.findIndex(item => item.user1 === data.message.recipientId || item.user2 === data.message.recipientId);
-                const session = newMeta.splice(idx, 1)[0];
-                newMeta.unshift(session);
-                return newMeta;
-            });
-
+                });
+            }
         }
+
 
         function onMessageDelivered({ data }) {
 
@@ -222,21 +213,12 @@ export function SocketProvider({ children }) {
         function onMessageReceived({ data }) {
             if (!(data.message.senderId in sessionsCache)) {
                 setSessionsCache(prev => ({
-                    ...prev, 
+                    ...prev,
                     [data.message.senderId]: {
                         messages: [],
                         unreadCount: 0,
                     }
                 }));
-                setSessionsMeta(prev => {
-                    const newMeta = [...prev];
-                    newMeta.unshift({
-                        ...data.session,
-                        unreadCount: 1,
-                        lastMessageDate: data.message.createdAt
-                    });
-                    return newMeta;
-                });
             }
             setSessionsCache(prev => {
                 const newMessages = [...prev[data.message.senderId].messages];
@@ -254,6 +236,22 @@ export function SocketProvider({ children }) {
 
         }
 
+        function onMessagesRetrieved({ messages, session }) {
+            console.log(messages)
+            if (messages.length) {
+                console.log('uncharted territory babey')
+                const user = session.user1 === getUser()._id ? session.user2 : session.user1;
+                messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setSessionsCache(prev => ({
+                    ...prev,
+                    [user]: {
+                        ...prev[user],
+                        messages: prev[user].messages.concat(messages)
+                    }
+                }));
+            }
+        }
+
 
         /** CHATS */
         // socket.on('send-message', onSendMessage);
@@ -262,6 +260,7 @@ export function SocketProvider({ children }) {
         socket.on('message-delivered', onMessageDelivered);
         socket.on('message-read', onMessageRead);
         socket.on('message-received', onMessageReceived);
+        socket.on('messages-retrieved', onMessagesRetrieved);
 
         return () => {
             // socket.off('send-message', onSendMessage);
@@ -270,28 +269,26 @@ export function SocketProvider({ children }) {
             socket.off('message-delivered', onMessageDelivered);
             socket.off('message-read', onMessageRead);
             socket.off('message-received', onMessageReceived);
+            socket.off('messages-retrieved', onMessagesRetrieved);
         }
 
 
-    }, []);
+    }, [sessionsCache]);
 
     const resetFriendRequestError = () => setFriendRequestError('');
     const resetSendMessageError = () => setSendMessageError('');
     const createEmptySession = (recipientId) => {
         if (!(recipientId in sessionsCache)) {
             const newSession = {
-                unread: 0,
                 messages: [],
-            };
-            setSessionsCache(prev => ({ ...prev, [recipientId]: newSession }));
-            setSessionsMeta(prev => {
-                const newMeta = [...prev];
-                newMeta.unshift({
+                session: {
                     user1: getUser()._id,
                     user2: recipientId,
-                });
-                return newMeta;
-            });
+                    unreadCount: 0,
+                }
+            };
+            setSessionsCache(prev => ({ ...prev, [recipientId]: newSession }));
+
         }
     }
     const markRead = (senderId) => {
@@ -307,22 +304,31 @@ export function SocketProvider({ children }) {
                     unreadCount: 0
                 }
             }));
-            const newMeta = sessionsMeta.map(item => {
-                if (item.user1 === senderId || item.user2 === senderId) {
-                    return { ...item, unreadCount: 0 }
-                }
-                return { ...item };
-            });
-            setSessionsMeta(newMeta);
         }
     };
+
+    // const clearEmptySessions = () => {
+    //     setSessionsMeta(prev => prev.filter(s => s._id));
+    // }
+    const clearEmptySessions = () => {
+        console.log('deleting empty sessions')
+        setSessionsCache(prev => {
+            const newState = {...prev};
+            for(let key in newState){
+                if(!newState[key].session?.head){
+                    delete newState[key];
+                }
+            }
+            return newState;
+        });
+    }
 
     const value = {
         isConnected,
         allContacts,
         sessionsCache,
-        sessionsMeta,
         createEmptySession,
+        clearEmptySessions,
         markRead,
         sendMessageError,
         friendRequestError,

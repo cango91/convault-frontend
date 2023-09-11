@@ -21,10 +21,10 @@ export default function ConnectionIndicator() {
 
     useEffect(()=>{
         if(isConnected){
-            clearTimeout(t);
+            clearTimeout(t.current);
             backoff.current = 1000;
         }
-    },[isConnected])
+    },[isConnected]);
 
     return (
         <div onClick={retryConnect} className={`connection-indicator ${isConnected ? 'connected' : t.current !== 0 || backoff.current > 1000 ? 'retrying' : 'disconnected'}`}></div>

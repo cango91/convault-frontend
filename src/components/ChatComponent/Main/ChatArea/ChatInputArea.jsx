@@ -1,6 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { socket } from "../../../../socket";
 
-export default function ChatAreaInput({recipient}) {
+export default function ChatAreaInput({ recipient }) {
+    const [msgText, setMsgText] = useState('');
     const input = useRef(null);
 
     useEffect(() => {
@@ -17,11 +19,29 @@ export default function ChatAreaInput({recipient}) {
         };
     }, []);
 
+    const handleChange = e => {
+        setMsgText(e.target.value);
+    }
+
+    const onSubmit = e =>{
+        e.preventDefault();
+        socket.emit('send-message',{recipient, content: msgText});
+        setMsgText('');
+    }
+
     return (
         <div className="chat-input-container">
             <div className="chat-input">
-                <textarea ref={input} rows="1" placeholder="Type a message"></textarea>
-                <input type="button" value="send" />
+                <form onSubmit={onSubmit}>
+                    <textarea 
+                    ref={input} 
+                    rows="1" 
+                    name="message"
+                    placeholder="Type a message" 
+                    onChange={handleChange} 
+                    value={msgText} ></textarea>
+                    <input type="submit" value="send" />
+                </form>
             </div>
         </div>
     );

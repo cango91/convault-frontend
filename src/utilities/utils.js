@@ -1,4 +1,4 @@
-import { getAccessToken, setAccessToken } from "./services/user-service";
+import { getAccessToken, getUser, setAccessToken } from "./services/user-service";
 // let timeoutId = null;
 
 // function debounceAsync(func, delay) {
@@ -118,3 +118,11 @@ export function base64ToArrayBuffer(base64) {
     }
     return bytes.buffer;
 };
+
+export function generateUserPairKey(users){
+    return users.sort().join(':');
+}
+
+export function generateSessionKey(otherUser){
+    return generateUserPairKey(getUser()._id,otherUser);
+}
