@@ -153,7 +153,7 @@ export function SocketProvider({ children }) {
 
     useEffect(() => {
         function onAllSessions(data) {
-            console.log('got all sessions:',data)
+            console.log('got all sessions:', data)
             const sortedSessions = data.sort((a, b) => {
                 return new Date(b.updatedAt) - new Date(a.updatedAt);
             });
@@ -188,7 +188,7 @@ export function SocketProvider({ children }) {
                 setSessionsCache(prev => {
                     const key = data.message.recipientId;
                     const messages = [data.message].concat(prev[key].messages);
-                    console.log(`message sent reporting:`,messages);
+                    console.log(`message sent reporting:`, messages);
                     return {
                         ...prev,
                         [key]: {
@@ -236,19 +236,37 @@ export function SocketProvider({ children }) {
 
         }
 
-        function onMessagesRetrieved({ messages, session }) {
-            console.log(messages)
+        function onMessagesRetrieved({ messages, session, from }) {
             if (messages.length) {
-                console.log('uncharted territory babey')
-                const user = session.user1 === getUser()._id ? session.user2 : session.user1;
-                messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                setSessionsCache(prev => ({
-                    ...prev,
-                    [user]: {
-                        ...prev[user],
-                        messages: prev[user].messages.concat(messages)
+                // find the right session
+                const sessionIdToFind = session;
+                let owningKey = null;
+                for (const [key, value] of Object.entries(sessionsCache)) {
+                    if (value.session?._id === sessionIdToFind) {
+                        owningKey = key;
+                        break;
                     }
-                }));
+                }
+                messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setSessionsCache(prev => {
+                    const insertIndex = prev[owningKey].messages.findIndex(msg => msg.previous === messages[0]._id);
+                    if(insertIndex===-1){
+                        return {
+                            ...prev,
+                            [owningKey]:{
+                                ...prev[owningKey],
+                                messages,
+                            }
+                        }
+                    }
+                    return {
+                        ...prev,
+                        [owningKey]: {
+                            ...prev[owningKey],
+                            messages: prev[owningKey].messages.slice(0,insertIndex).concat(messages)
+                        }
+                    }
+                });
             }
         }
 
@@ -313,9 +331,9 @@ export function SocketProvider({ children }) {
     const clearEmptySessions = () => {
         console.log('deleting empty sessions')
         setSessionsCache(prev => {
-            const newState = {...prev};
-            for(let key in newState){
-                if(!newState[key].session?.head){
+            const newState = { ...prev };
+            for (let key in newState) {
+                if (!newState[key].session?.head) {
                     delete newState[key];
                 }
             }
