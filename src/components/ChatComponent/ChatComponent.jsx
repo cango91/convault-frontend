@@ -102,7 +102,7 @@ export default function ChatComponent() {
         }
     }
 
-    const onSwitchedToChat = (id) => {
+    const onSwitchedToChat = () => {
         setSwitchToChat('');
     };
 

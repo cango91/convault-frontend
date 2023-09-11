@@ -1,9 +1,27 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { socket } from "../../../../socket";
+import { useCrypto } from "../../../../contexts/CryptoContext";
+import { useSocket } from "../../../../contexts/SocketContext";
 
 export default function ChatAreaInput({ recipient }) {
     const [msgText, setMsgText] = useState('');
     const input = useRef(null);
+    const { encryptAESGCM, generateSymmetricKeyForSession } = useCrypto();
+    const { allContacts } = useSocket();
+
+    const encryptMessage = useCallback(async (content, recipientId) => {
+        try {
+            const pk = allContacts.find(c => c.contact._id === recipientId).contact.publicKey;
+            const { aesKey, encryptedAesKey } = await generateSymmetricKeyForSession(recipientId, pk);
+            const encryptedContent = await encryptAESGCM(content, aesKey);
+            return {
+                encryptedContent ,
+                symmetricKey: encryptedAesKey
+            };
+        } catch (error) {
+            console.error(error);
+        }
+    }, [allContacts, encryptAESGCM, generateSymmetricKeyForSession]);
 
     useEffect(() => {
         const textarea = input.current;
@@ -23,9 +41,11 @@ export default function ChatAreaInput({ recipient }) {
         setMsgText(e.target.value);
     }
 
-    const onSubmit = e => {
+    const onSubmit = async e => {
         e.preventDefault();
-        socket.emit('send-message', { recipient, content: msgText });
+        // socket.emit('send-message', { recipient, content: msgText });
+        const { encryptedContent, symmetricKey } = await encryptMessage(msgText, recipient);
+        socket.emit('send-encrypted', { recipient, encryptedContent, symmetricKey });
         setMsgText('');
     }
 
@@ -37,6 +57,8 @@ export default function ChatAreaInput({ recipient }) {
             onSubmit(e);
         }
     }
+
+
 
     return (
         <div className="chat-input-container">

@@ -12,13 +12,13 @@ export default function ChatHistoryPane({ friendId }) {
     const chatContainerRef = useRef(null);
     const lastMessageRef = useRef(null);
 
-    const messages = sessionsCache[friendId].messages;
-    const head = sessionsCache[friendId].session?.head;
-    const session = sessionsCache[friendId].session?._id;
-    const nextMsg = (messages.length && messages[messages.length - 1].previous) || null;
+    const messages = sessionsCache[friendId]?.messages;
+    const head = sessionsCache[friendId]?.session?.head;
+    const session = sessionsCache[friendId]?.session?._id;
+    const nextMsg = (messages.length && messages[messages.length - 1]?.previous) || null;
 
     useEffect(() => {
-        if (!head) return;
+        if (!head || !messages) return;
         if (!messages.length) {
             if (head) {
                 socket.emit('get-messages', { from: head, session, count: 30 });
@@ -35,6 +35,7 @@ export default function ChatHistoryPane({ friendId }) {
     }, [remainingScroll, session, nextMsg]);
 
     useEffect(() => {
+        if(!messages) return;
         const handleScroll = () => {
             if (!lastMessageRef.current) return;
             const lastMessageRect = lastMessageRef.current.getBoundingClientRect();
@@ -73,7 +74,7 @@ export default function ChatHistoryPane({ friendId }) {
                     if (idx === messages.length - 1) {
                         return (
                             <div key={msg._id} ref={lastMessageRef} className={`chat-message ${direction} ${decoration}`}>
-                               <div className="message-content"> {trimWhiteSpace(decode(msg.encryptedContent))}</div>
+                               <div className="message-content"> {(msg.decryptedContent)}</div>
                                 <div className="timestamp">{new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
                             </div>
                         );
@@ -81,7 +82,7 @@ export default function ChatHistoryPane({ friendId }) {
 
                     return (
                         <div key={msg._id} className={`chat-message ${direction} ${decoration}`}>
-                              <div className="message-content"> {trimWhiteSpace(decode(msg.encryptedContent))}</div>
+                              <div className="message-content"> {(msg.decryptedContent)}</div>
                             <div className="timestamp">{new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
 
                         </div>

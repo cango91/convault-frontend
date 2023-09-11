@@ -11,7 +11,7 @@ export const useLogout = () => useContext(LogoutContext);
 export function LogoutProvider({ children }) {
     const navigate = useNavigate();
     const { setJwt, setHasPublicKey } = useAuth();
-    const { resetMnemonic, deleteKeys } = useCrypto();
+    const { resetMnemonic, deleteKeys, deleteDHKeys, deleteAesKeys } = useCrypto();
 
     const logout = async () => {
         await api.logout();
@@ -19,6 +19,8 @@ export function LogoutProvider({ children }) {
         resetMnemonic();
         deleteKeys();
         setHasPublicKey(false);
+        deleteDHKeys();
+        deleteAesKeys();
         navigate('/');
     }
 

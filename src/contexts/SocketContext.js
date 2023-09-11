@@ -1,6 +1,8 @@
+import {decode} from 'he';
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getUser, refreshUserTk } from "../utilities/services/user-service";
 import { socket } from "../socket";
+import { useCrypto } from "./CryptoContext";
 
 const SocketContext = createContext();
 
@@ -19,6 +21,8 @@ export function SocketProvider({ children }) {
     const [sessionsCache, setSessionsCache] = useState({});
     const [friendRequestError, setFriendRequestError] = useState('');
     const [sendMessageError, setSendMessageError] = useState('');
+    const [sessionKeyStore, setSessionKeyStore] = useState({});
+    const { decryptAESGCM, decryptSymmetricKey, privateKey} = useCrypto();
 
     useEffect(() => {
         function onConnect() {
@@ -149,9 +153,30 @@ export function SocketProvider({ children }) {
     }, [allContacts]);
 
 
+    
+
+    
+
     /** CHATS */
 
     useEffect(() => {
+        const getDecryptedKey = async (key) => {
+            if (sessionKeyStore[key]) return sessionKeyStore[key];
+            const decryptedKey = await decryptSymmetricKey(key, privateKey);
+            setSessionKeyStore(prev => ({ ...prev, [key]: decryptedKey }));
+            return decryptedKey;
+        };
+        const decryptMessage = async ({ encryptedContent, symmetricKey }) => {
+            try {
+                symmetricKey = decode(symmetricKey);
+                encryptedContent = decode(encryptedContent);
+                const decryptedKey = await getDecryptedKey(symmetricKey);
+                const decryptedMessage = await decryptAESGCM(encryptedContent, decryptedKey);
+                return decryptedMessage;
+            } catch (error) {
+                console.error(error);
+            }
+        };
         function onAllSessions(data) {
             const sortedSessions = data.sort((a, b) => {
                 return new Date(b.updatedAt) - new Date(a.updatedAt);
@@ -170,7 +195,9 @@ export function SocketProvider({ children }) {
             setSessionsCache(sessions);
         }
 
-        function onMessageSent({ data }) {
+        async function onMessageSent({ data }) {
+            const decryptedMessage = await decryptMessage(data.message);
+            data.message.decryptedContent = decryptedMessage;
             if (!(data.message.recipientId in sessionsCache)) {
                 setSessionsCache(prev => ({
                     ...prev,
@@ -205,7 +232,8 @@ export function SocketProvider({ children }) {
         function onMessageRead({ data }) {
 
         }
-        function onMessageReceived({ data }) {
+        async function onMessageReceived({ data }) {
+            data.message.decryptedContent = await decryptMessage(data.message);
             if (!(data.message.senderId in sessionsCache)) {
                 setSessionsCache(prev => ({
                     ...prev,
@@ -232,7 +260,9 @@ export function SocketProvider({ children }) {
             }
         }
 
-        function onMessagesRetrieved({ messages, session, from }) {
+
+
+        async function onMessagesRetrieved({ messages, session, from }) {
             if (messages.length) {
                 // find the right session
                 const sessionIdToFind = session;
@@ -244,15 +274,18 @@ export function SocketProvider({ children }) {
                     }
                 }
                 messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                for (let i = 0; i < messages.length; i++) {
+                    messages[i].decryptedContent = await decryptMessage(messages[i]);
+                }
                 setSessionsCache(prev => {
-                    if(prev[owningKey]._fetched && prev[owningKey]._fetched.length){
-                        if(prev[owningKey]._fetched.includes(messages[0]._id)) return prev;
+                    if (prev[owningKey]._fetched && prev[owningKey]._fetched.length) {
+                        if (prev[owningKey]._fetched.includes(messages[0]._id)) return prev;
                     }
                     const insertIndex = prev[owningKey].messages.findIndex(msg => msg.previous === messages[0]._id);
-                    if(insertIndex===-1){
+                    if (insertIndex === -1) {
                         return {
                             ...prev,
-                            [owningKey]:{
+                            [owningKey]: {
                                 ...prev[owningKey],
                                 messages,
                                 _fetched: prev[owningKey]._fetched ? prev[owningKey]._fetched.concat([messages[0]._id]) : [messages[0]._id]
@@ -263,7 +296,7 @@ export function SocketProvider({ children }) {
                         ...prev,
                         [owningKey]: {
                             ...prev[owningKey],
-                            messages: prev[owningKey].messages.slice(0,insertIndex).concat(messages),
+                            messages: prev[owningKey].messages.slice(0, insertIndex).concat(messages),
                             _fetched: prev[owningKey]._fetched ? prev[owningKey]._fetched.concat([messages[0]._id]) : [messages[0]._id]
                         }
                     }
@@ -292,7 +325,7 @@ export function SocketProvider({ children }) {
         }
 
 
-    }, [sessionsCache]);
+    }, [sessionsCache,sessionKeyStore,privateKey]);
 
     const resetFriendRequestError = () => setFriendRequestError('');
     const resetSendMessageError = () => setSendMessageError('');
@@ -338,6 +371,28 @@ export function SocketProvider({ children }) {
             return newState;
         });
     }
+
+
+
+
+
+    // async function decryptMessage({ encryptedContent, symmetricKey }) {
+    //     try {
+    //         const decryptedKey = await getDecryptedKey(symmetricKey);
+    //         const decryptedMessage = await decryptAESGCM(encryptedContent, decryptedKey);
+    //         return decryptedMessage;
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // }
+
+
+    // async function getDecryptedKey(key) {
+    //     if (sessionKeyStore[key]) return sessionKeyStore[key];
+    //     const decryptedKey = await decryptSymmetricKey(key, privateKey);
+    //     setSessionKeyStore(prev => ({ ...prev, [key]: decryptedKey }));
+    //     return decryptedKey;
+    // }
 
     const value = {
         isConnected,
