@@ -5,6 +5,7 @@
     box-sizing: border-box;
     gap: 10px;
     overflow: hidden;
+    min-width: 275px;
 }
 
 .chat-history::-webkit-scrollbar {
@@ -88,7 +89,7 @@
     align-self: start;
 }
 
-.chat-message.received:not(:first-of-type) {
+.chat-message.received:not(.last-received) {
     margin-bottom: 4px;
 }
 
@@ -119,7 +120,7 @@
 
 /** SENT */
 
-.chat-message.sent:not(:first-of-type) {
+.chat-message.sent:not(.last-sent) {
     margin-bottom: 4px;
 }
 

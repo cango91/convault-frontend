@@ -30,7 +30,12 @@ export default function ChatAreaInput({ recipient }) {
     }
 
     const handleKeyDown = e => {
-        if ((e.ctrlKey || e.metaKey) && e.keyCode === 13 && msgText) onSubmit(e);
+        if (e.ctrlKey || e.metaKey || e.shiftKey) {
+
+        } else if (e.keyCode === 13 && msgText) {
+            e.preventDefault();
+            onSubmit(e);
+        }
     }
 
     return (

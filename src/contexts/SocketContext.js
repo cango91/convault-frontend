@@ -148,12 +148,11 @@ export function SocketProvider({ children }) {
         }
     }, [allContacts]);
 
-    /** CHATS */
 
+    /** CHATS */
 
     useEffect(() => {
         function onAllSessions(data) {
-            console.log('got all sessions:', data)
             const sortedSessions = data.sort((a, b) => {
                 return new Date(b.updatedAt) - new Date(a.updatedAt);
             });
@@ -172,10 +171,7 @@ export function SocketProvider({ children }) {
         }
 
         function onMessageSent({ data }) {
-            console.log('message-setn data: ', data);
-            console.log('at the time, the cache', sessionsCache);
             if (!(data.message.recipientId in sessionsCache)) {
-                console.log('reporting from message sent, problem')
                 setSessionsCache(prev => ({
                     ...prev,
                     [data.message.recipientId]: {
@@ -188,7 +184,6 @@ export function SocketProvider({ children }) {
                 setSessionsCache(prev => {
                     const key = data.message.recipientId;
                     const messages = [data.message].concat(prev[key].messages);
-                    console.log(`message sent reporting:`, messages);
                     return {
                         ...prev,
                         [key]: {
@@ -215,25 +210,26 @@ export function SocketProvider({ children }) {
                 setSessionsCache(prev => ({
                     ...prev,
                     [data.message.senderId]: {
-                        messages: [],
-                        unreadCount: 0,
-                    }
+                        messages: [data.message],
+                        unreadCount: 1,
+                        session: data.session,
+                    },
                 }));
-            }
-            setSessionsCache(prev => {
-                const newMessages = [...prev[data.message.senderId].messages];
-                newMessages.unshift(data.message)
-                return {
-                    ...prev,
-                    [data.message.senderId]: {
-                        messages: newMessages,
-                        unreadCount: prev[data.message.senderId].unreadCount + 1,
-                        head: data.message._id,
-                        lastMessageDate: data.message.createdAt,
+            } else {
+                setSessionsCache(prev => {
+                    const key = data.message.senderId;
+                    const messages = [data.message].concat(prev[key].messages);
+                    return {
+                        ...prev,
+                        [key]: {
+                            ...prev[key],
+                            messages,
+                            unreadCount: prev[key].unreadCount + 1,
+                            session: data.session,
+                        }
                     }
-                }
-            });
-
+                });
+            }
         }
 
         function onMessagesRetrieved({ messages, session, from }) {
@@ -249,6 +245,9 @@ export function SocketProvider({ children }) {
                 }
                 messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 setSessionsCache(prev => {
+                    if(prev[owningKey]._fetched && prev[owningKey]._fetched.length){
+                        if(prev[owningKey]._fetched.includes(messages[0]._id)) return prev;
+                    }
                     const insertIndex = prev[owningKey].messages.findIndex(msg => msg.previous === messages[0]._id);
                     if(insertIndex===-1){
                         return {
@@ -256,6 +255,7 @@ export function SocketProvider({ children }) {
                             [owningKey]:{
                                 ...prev[owningKey],
                                 messages,
+                                _fetched: prev[owningKey]._fetched ? prev[owningKey]._fetched.concat([messages[0]._id]) : [messages[0]._id]
                             }
                         }
                     }
@@ -263,7 +263,8 @@ export function SocketProvider({ children }) {
                         ...prev,
                         [owningKey]: {
                             ...prev[owningKey],
-                            messages: prev[owningKey].messages.slice(0,insertIndex).concat(messages)
+                            messages: prev[owningKey].messages.slice(0,insertIndex).concat(messages),
+                            _fetched: prev[owningKey]._fetched ? prev[owningKey]._fetched.concat([messages[0]._id]) : [messages[0]._id]
                         }
                     }
                 });
@@ -325,11 +326,8 @@ export function SocketProvider({ children }) {
         }
     };
 
-    // const clearEmptySessions = () => {
-    //     setSessionsMeta(prev => prev.filter(s => s._id));
-    // }
+
     const clearEmptySessions = () => {
-        console.log('deleting empty sessions')
         setSessionsCache(prev => {
             const newState = { ...prev };
             for (let key in newState) {
