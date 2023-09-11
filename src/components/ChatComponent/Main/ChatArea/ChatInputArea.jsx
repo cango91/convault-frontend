@@ -23,23 +23,29 @@ export default function ChatAreaInput({ recipient }) {
         setMsgText(e.target.value);
     }
 
-    const onSubmit = e =>{
+    const onSubmit = e => {
         e.preventDefault();
-        socket.emit('send-message',{recipient, content: msgText});
+        socket.emit('send-message', { recipient, content: msgText });
         setMsgText('');
+    }
+
+    const handleKeyDown = e => {
+        if (e.keyCode === 13 && msgText) onSubmit(e);
     }
 
     return (
         <div className="chat-input-container">
             <div className="chat-input">
                 <form onSubmit={onSubmit}>
-                    <textarea 
-                    ref={input} 
-                    rows="1" 
-                    name="message"
-                    placeholder="Type a message" 
-                    onChange={handleChange} 
-                    value={msgText} ></textarea>
+                    <textarea
+                        ref={input}
+                        rows="1"
+                        name="message"
+                        placeholder="Type a message"
+                        onChange={handleChange}
+                        value={msgText}
+                        onKeyDown={handleKeyDown}
+                    ></textarea>
                     <input type="submit" value="send" />
                 </form>
             </div>
