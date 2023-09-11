@@ -38,6 +38,7 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
 
     /** Tabs Switched */
     const handleTabSwitch = (tab) => {
+        if(tab===activeTab) return;
         setActiveTab(tab);
         clearEmptySessions();
         onTabSwitched();

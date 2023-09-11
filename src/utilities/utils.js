@@ -119,10 +119,36 @@ export function base64ToArrayBuffer(base64) {
     return bytes.buffer;
 };
 
-export function generateUserPairKey(users){
+export function generateUserPairKey(users) {
     return users.sort().join(':');
 }
 
-export function generateSessionKey(otherUser){
-    return generateUserPairKey(getUser()._id,otherUser);
+export function generateSessionKey(otherUser) {
+    return generateUserPairKey(getUser()._id, otherUser);
 }
+
+export function getRelativeDateString(date) {
+    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+
+    const yesterdayStart = new Date(todayStart);
+    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+
+    const sevenDaysAgo = new Date(todayStart);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    if (date >= todayStart) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (date >= yesterdayStart && date < todayStart) {
+        return "yesterday";
+    } else if (date >= sevenDaysAgo && date < yesterdayStart) {
+        return date.toLocaleDateString([], { weekday: 'long' });
+    } else {
+        return date.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+}
+
+export function trimWhiteSpace(str) {
+    return str.replace(/^\s+|\s+$/g, '');
+  }

@@ -95,6 +95,7 @@ export default function PrivKeyManual() {
     return (
         <>
         <LogoutButton />
+        <WelcomeHeader username={getUser().username} />
             <div className="flex-ctr">
                 {
                     <div className="upload-key">

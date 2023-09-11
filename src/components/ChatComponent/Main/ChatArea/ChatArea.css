@@ -24,6 +24,7 @@
     overflow-y: scroll;
     scrollbar-width: thin;
     scrollbar-color: darkgrey rgba(1, 1, 1, 0);
+    padding: 0 3rem;
 }
 
 .chat-input-container {
@@ -36,7 +37,6 @@
     display: flex;
     align-items: flex-end;
     flex-shrink: 0;
-    /* Ensure it doesn't shrink */
     align-items: center;
     position: relative;
     line-height: 20px;
@@ -55,15 +55,29 @@
     border: none;
     color: antiquewhite;
     margin-right: 10px;
-    height: auto;
-    line-height: 17px;
-    padding-top: 5px;
+    height: 10px;
+    line-height: 20px;
+    padding-top: 15px;
+    padding-left: 10px;
     outline: none;
-    font-size: 15px;
+    font-size: 17px;
+    font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-feature-settings: "kern";
     font-kerning: auto;
     font-optical-sizing: auto;
     font-weight: 400;
+}
+
+.chat-input form input[type="submit"]{
+    border-radius: 5px;
+    padding: 5px 10px;
+    background: hsla(126, 98%, 22%, 0.602);
+    border: 1px solid hsl(201, 89%, 7%);
+    outline: none;
+    color: antiquewhite;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.1s; 
 }
 
 /* .chat-input button {
@@ -71,18 +85,80 @@
 } */
 
 .chat-message {
-    padding: 10px 20px;
+    /* padding: 8px 20px; */
     margin-bottom: 10px;
     background-color: #4f704f;
     border-radius: 10px;
     position: relative;
     max-width: 70%;
-    min-width: 125px;
+    min-width: none;
     display: flex;
     flex-shrink: 1;
     color: antiquewhite;
     white-space: pre-line;
+    padding:0;
+    flex-direction: column;
 }
+
+.sent .message-content {
+    padding: 8px 10px 0 10px;
+    flex-grow: 1;
+    font-size: 14px;
+}
+.received .message-content {
+    padding: 8px 10px 0 10px;
+    flex-grow: 1;
+    font-size: 14px;
+}
+.chat-message.sent .message-content::after {
+    content: "";
+    display: inline-block;
+    width: 50px;  /* Width of the timestamp */
+    height: 1px;
+    background: transparent;
+    vertical-align: bottom;
+  }
+
+  .chat-message.received .message-content::after {
+    content: "";
+    display: inline-block;
+    width: 50px;  /* Width of the timestamp */
+    height: 1px;
+    background: transparent;
+    vertical-align: bottom;
+  }
+
+
+.sent .timestamp {
+    font-size: 10px;
+    color: #2a475a;
+    margin: auto 10px 5px 0;
+    align-self: flex-end;
+  }
+
+
+.last-sent .timestamp {
+    font-size: 10px;
+    color: #2a475a;
+    margin: auto 15px 5px 0;
+    white-space: nowrap;
+  }
+
+.received .timestamp {
+    font-size: 10px;
+    color: #b5bcc0;
+    margin: auto 10px 5px 0;
+    align-self: flex-end;
+    white-space: nowrap;
+  }
+.last-received .timestamp {
+    font-size: 10px;
+    color: #b5bcc0;
+    margin: auto 10px 5px 0;
+    align-self: flex-end;
+    white-space: nowrap;
+  }
+
 
 .chat-message.received {
     margin-left: 10px;
@@ -90,21 +166,10 @@
 }
 
 .chat-message.received:not(.last-received) {
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
-/* .chat-message.first-received::before {
-    content: "";
-    position: absolute;
-    top: -15px;
-    left: -3px;
-    width: 0;
-    height: 0;
-    transform: rotateZ(-45deg);
-    border: 15px solid transparent;
-    border-left-color: #4f704f;
-    border-top-left-radius: 0;
-} */
+
 .chat-message.last-received::before {
     content: "";
     position: absolute;
@@ -118,16 +183,15 @@
     border-top-left-radius: 0;
 }
 
-/** SENT */
-
 .chat-message.sent:not(.last-sent) {
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .chat-message.sent {
     margin-right: 10px;
     align-self: flex-end;
     background-color: #82867f;
+    color:rgb(244, 253, 255);
 }
 
 .chat-message.last-sent::before {
@@ -140,4 +204,17 @@
     transform: rotateZ(-45deg);
     border: 15px solid transparent;
     border-right-color: #82867f;
+}
+
+
+@media screen and (max-width: 500px) {
+    .chat-history {
+        padding: 0 20px;
+    }
+}
+
+@media screen and (min-width: 1300px) {
+    .chat-history {
+        padding: 0 5rem;
+    }
 }

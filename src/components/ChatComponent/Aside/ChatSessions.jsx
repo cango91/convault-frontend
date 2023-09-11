@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "../../../contexts/SocketContext";
 import { getUser } from "../../../utilities/services/user-service";
+import { getRelativeDateString } from "../../../utilities/utils";
 
 export default function ChatSessions({ onSelectChat, selectChat, clearSelection, onClearedSelection }) {
     const [selectedChat, setSelectedChat] = useState('');
     const [sessionsMeta, setSessionsMeta] = useState([]);
+    const [filteredChats, setFilteredChats] = useState([]);
     const { allContacts, sessionsCache, clearEmptySessions } = useSocket();
 
     useEffect(() => {
@@ -30,6 +32,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
 
 
     const handleSelectChat = (id) => {
+        if(selectedChat && selectedChat===id) return;
         setSelectedChat(id);
         onSelectChat(id);
         clearEmptySessions();
@@ -43,6 +46,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                     type="text"
                     className="login-input search-input"
                     name="filter-sessions"
+                    placeholder="filter chats"
                 />
                 <i className="search-input-icon"></i>
             </div>
@@ -74,7 +78,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                                             </div>
                                             <div className="chat-meta__sup__date_div">
                                                 <span className="chat-meta__sup__date_span">
-                                                    {(session?.updatedAt ? new Date(session.updatedAt).toLocaleString() : '') || 'N/A'}
+                                                    {(session?.updatedAt ? getRelativeDateString(new Date(session.updatedAt)) : '') || 'N/A'}
                                                 </span>
                                             </div>
                                         </div>

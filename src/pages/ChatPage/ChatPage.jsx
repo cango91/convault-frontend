@@ -10,11 +10,8 @@ export default function ChatPage() {
     return (
         <>
             <SocketProvider>
-
                 {privateKey &&
                         <ChatComponent />
-
-
                 }
                 {
                     !privateKey &&
@@ -23,7 +20,6 @@ export default function ChatPage() {
                         <PrivKeySetter />
                     </>
                 }
-
             </SocketProvider> </>
     );
 }

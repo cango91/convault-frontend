@@ -3,6 +3,7 @@ import { useSocket } from "../../../../contexts/SocketContext";
 import { socket } from "../../../../socket";
 import { getUser } from "../../../../utilities/services/user-service";
 import { decode } from 'he';
+import { trimWhiteSpace } from "../../../../utilities/utils";
 
 export default function ChatHistoryPane({ friendId }) {
     const { sessionsCache, createEmptySession } = useSocket();
@@ -14,31 +15,31 @@ export default function ChatHistoryPane({ friendId }) {
     const messages = sessionsCache[friendId].messages;
     const head = sessionsCache[friendId].session?.head;
     const session = sessionsCache[friendId].session?._id;
-    const nextMsg = (messages.length && messages[messages.length-1].previous )|| null;
+    const nextMsg = (messages.length && messages[messages.length - 1].previous) || null;
 
     useEffect(() => {
         if (!head) return;
         if (!messages.length) {
             if (head) {
-                socket.emit('get-messages', { from: head, session, count:30 });
+                socket.emit('get-messages', { from: head, session, count: 30 });
             }
             return;
         }
     }, [messages, head, session]);
 
-    useEffect(()=>{
-        if(!nextMsg) return;
-        if(remainingScroll < 300){
+    useEffect(() => {
+        if (!nextMsg) return;
+        if (remainingScroll < 300) {
             socket.emit('get-messages', { from: nextMsg, session, count: 30 })
         }
-    },[remainingScroll,session, nextMsg]);
+    }, [remainingScroll, session, nextMsg]);
 
     useEffect(() => {
         const handleScroll = () => {
-            if(!lastMessageRef.current) return;
+            if (!lastMessageRef.current) return;
             const lastMessageRect = lastMessageRef.current.getBoundingClientRect();
             const containerRect = chatContainerRef.current.getBoundingClientRect();
-            setRemainingScroll(containerRect.top-lastMessageRect.bottom);
+            setRemainingScroll(containerRect.top - lastMessageRect.bottom);
         }
         const chatContainer = chatContainerRef.current;
         chatContainer.addEventListener('scroll', handleScroll);
@@ -72,14 +73,17 @@ export default function ChatHistoryPane({ friendId }) {
                     if (idx === messages.length - 1) {
                         return (
                             <div key={msg._id} ref={lastMessageRef} className={`chat-message ${direction} ${decoration}`}>
-                                {decode(msg.encryptedContent)}
+                               <div className="message-content"> {trimWhiteSpace(decode(msg.encryptedContent))}</div>
+                                <div className="timestamp">{new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
                             </div>
                         );
                     }
 
                     return (
                         <div key={msg._id} className={`chat-message ${direction} ${decoration}`}>
-                            {decode(msg.encryptedContent)}
+                              <div className="message-content"> {trimWhiteSpace(decode(msg.encryptedContent))}</div>
+                            <div className="timestamp">{new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
+
                         </div>
                     );
                 })
