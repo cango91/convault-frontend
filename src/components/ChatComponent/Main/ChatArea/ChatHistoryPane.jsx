@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSocket } from "../../../../contexts/SocketContext";
 import { socket } from "../../../../socket";
 import { getUser } from "../../../../utilities/services/user-service";
+import {decode} from 'he';
 
 export default function ChatHistoryPane({ friendId }) {
     const { sessionsCache, createEmptySession } = useSocket();
@@ -28,10 +29,6 @@ export default function ChatHistoryPane({ friendId }) {
 
     return (
         <div className="chat-history">
-            {/* <div className="chat-message received">hello</div>
-            <div className="chat-message received first-received">sup</div>
-            <div className="chat-message sent last-sent">how u doing</div>
-            <div className="chat-message sent">oo mein bruther</div> */}
             {
                 messages && !!messages.length && messages.map((msg, idx) => {
                     const userId = getUser()._id;
@@ -53,7 +50,7 @@ export default function ChatHistoryPane({ friendId }) {
 
                     return (
                         <div className={`chat-message ${direction} ${decoration}`}>
-                            {msg.encryptedContent}
+                            {decode(msg.encryptedContent)}
                         </div>
                     );
                 })

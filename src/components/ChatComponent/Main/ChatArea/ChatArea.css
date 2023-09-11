@@ -69,6 +69,7 @@
     display: flex;
     flex-shrink: 1;
     color: antiquewhite;
+    white-space:pre-line;
 }
 
 .chat-message.received {
