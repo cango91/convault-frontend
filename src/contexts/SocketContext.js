@@ -1,4 +1,4 @@
-import {decode} from 'he';
+import { decode } from 'he';
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getUser, refreshUserTk } from "../utilities/services/user-service";
 import { socket } from "../socket";
@@ -21,8 +21,8 @@ export function SocketProvider({ children }) {
     const [sessionsCache, setSessionsCache] = useState({});
     const [friendRequestError, setFriendRequestError] = useState('');
     const [sendMessageError, setSendMessageError] = useState('');
-    const [sessionKeyStore, setSessionKeyStore] = useState({});
-    const { decryptAESGCM, decryptSymmetricKey, privateKey} = useCrypto();
+    const { decryptAESGCM, decryptSymmetricKey,
+        privateKey, manageContent, getKey,  } = useCrypto();
 
     useEffect(() => {
         function onConnect() {
@@ -153,30 +153,13 @@ export function SocketProvider({ children }) {
     }, [allContacts]);
 
 
-    
 
-    
+
+
 
     /** CHATS */
 
     useEffect(() => {
-        const getDecryptedKey = async (key) => {
-            if (sessionKeyStore[key]) return sessionKeyStore[key];
-            const decryptedKey = await decryptSymmetricKey(key, privateKey);
-            setSessionKeyStore(prev => ({ ...prev, [key]: decryptedKey }));
-            return decryptedKey;
-        };
-        const decryptMessage = async ({ encryptedContent, symmetricKey }) => {
-            try {
-                symmetricKey = decode(symmetricKey);
-                encryptedContent = decode(encryptedContent);
-                const decryptedKey = await getDecryptedKey(symmetricKey);
-                const decryptedMessage = await decryptAESGCM(encryptedContent, decryptedKey);
-                return decryptedMessage;
-            } catch (error) {
-                console.error(error);
-            }
-        };
         function onAllSessions(data) {
             const sortedSessions = data.sort((a, b) => {
                 return new Date(b.updatedAt) - new Date(a.updatedAt);
@@ -196,7 +179,8 @@ export function SocketProvider({ children }) {
         }
 
         async function onMessageSent({ data }) {
-            const decryptedMessage = await decryptMessage(data.message);
+            //const decryptedMessage = await decryptMessage(data.message);
+            const decryptedMessage = await manageContent()
             data.message.decryptedContent = decryptedMessage;
             if (!(data.message.recipientId in sessionsCache)) {
                 setSessionsCache(prev => ({
@@ -325,7 +309,7 @@ export function SocketProvider({ children }) {
         }
 
 
-    }, [sessionsCache,sessionKeyStore,privateKey]);
+    }, [sessionsCache, sessionKeyStore, privateKey, decryptAESGCM, decryptSymmetricKey]);
 
     const resetFriendRequestError = () => setFriendRequestError('');
     const resetSendMessageError = () => setSendMessageError('');

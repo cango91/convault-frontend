@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useCallback } from "react";
 import * as bip39 from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
 import { arrayBufferToBase64, base64ToArrayBuffer } from "../utilities/utils";
+import { decode } from "he";
 
 const CryptoContext = createContext();
 
@@ -18,7 +19,8 @@ export function CryptoProvider({ children }) {
     const [privateKey, setPrivateKey] = useState(null);
     const [publicKey, setPublicKey] = useState(null);
     const [dhKeysMap, setDhKeysMap] = useState({});
-    const [aesKeysMap, setAesKeysMap] = useState({});
+    const [userKeyMap, setUserKeyMap] = useState({});
+    const [symmetricKeyStore, setSymmetricKeyStore] = useState({});
 
     const generateMnemonic = (strength = 128) => {
         const newMnemonic = bip39.generateMnemonic(wordlist, strength).split(' ');
@@ -153,15 +155,8 @@ export function CryptoProvider({ children }) {
         );
 
         return arrayBufferToBase64(encryptedAESKey);
-    },[]);
+    }, []);
 
-    const generateSymmetricKeyForSession = useCallback(async (userId, userPublicKey) => {
-        if (userId in aesKeysMap) return aesKeysMap[userId];
-        const aesKey = await generateSymmetricKey();
-        const encryptedAesKey = await encryptSymmetrickey(aesKey, userPublicKey);
-        setAesKeysMap(prev => ({ ...prev, [userId]: {aesKey, encryptedAesKey} }));
-        return aesKeysMap[userId];
-    }, [aesKeysMap,encryptSymmetrickey]);
 
     const decryptSymmetricKey = async (encryptedAESKey, ownPrivateKey) => {
         const decryptedAESKeyBuffer = await window.crypto.subtle.decrypt(
@@ -224,7 +219,56 @@ export function CryptoProvider({ children }) {
         return dec.decode(decryptedData);
     }
 
-    const deleteAesKeys = () => setAesKeysMap({});
+    const deleteAesKeys = () => { 
+        setUserKeyMap({});
+        setSymmetricKeyStore({});
+    }
+
+    // Handle decryption key retrieval
+
+    /**  */
+    const manageKeys = useCallback(async (userId, userPublicKey, socket) => {
+        if (userId in userKeyMap) return userKeyMap[userId];
+        try {
+            const aesKey = await generateSymmetricKey();
+            const ownEncryptedAesKey = await encryptSymmetrickey(aesKey, publicKey);
+            const recipientEncryptedAesKey = await encryptSymmetrickey(aesKey, userPublicKey);
+            const newKeyPair = { aesKey, recipientEncryptedAesKey, ownEncryptedAesKey };
+            setUserKeyMap(prev => ({ ...prev, [userId]: newKeyPair }));
+            setSymmetricKeyStore(prev => ({ ...prev, recipientEncryptedAesKey: aesKey }));
+            // store on the server
+            socket.emit('set-key', {
+                key: recipientEncryptedAesKey,
+                value: ownEncryptedAesKey,
+            });
+            return newKeyPair;
+        } catch (error) {
+            console.error("Error in manageKeys:", error);
+        }
+    }, [publicKey, userKeyMap, encryptSymmetrickey]);
+
+    const getKey = async (key, socket) => {
+        if (symmetricKeyStore[key]) return symmetricKeyStore[key];
+        return new Promise((resolve, reject) => {
+            socket.emit('get-key', { key }, (response, data) => {
+                if (response !== 'got-key') return reject(data.message);
+                setSymmetricKeyStore(prev => ({ ...prev, [key]: data.value }));
+                resolve(data.value);
+            });
+        });
+    };
+
+    const manageContent = async ({ content, key, operation, socket }) => {
+        try {
+            const decryptedKey = await getKey(key, socket);
+            return operation === 'encrypt'
+                ? encryptAESGCM(content, decryptedKey)
+                : decryptAESGCM(content, decryptedKey);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
 
 
     // ephemeral key generation. 1 pair per user-pair per session (for perfect forward secrecy feature - icebox)
@@ -319,7 +363,9 @@ export function CryptoProvider({ children }) {
         importPrivateKey,
         importPublicKey,
         generateSymmetricKey,
-        generateSymmetricKeyForSession,
+        manageContent,
+        manageKeys,
+        getKey,
         deleteAesKeys,
         encryptAESGCM,
         decryptAESGCM,
