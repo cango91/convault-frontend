@@ -48,6 +48,10 @@ export default function ChatAreaInput({ recipient }) {
 
     const onSubmit = useCallback(async e => {
         e.preventDefault();
+        if(!msgText.replace(/\s+/g, '')){
+            setMsgText('');
+            return
+        }
         const keyPair = await manageKeys(recipient, recipientKey, socket);
         const encryptedContent = await manageContent({
             content: msgText,
