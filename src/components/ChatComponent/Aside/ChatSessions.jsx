@@ -41,7 +41,10 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
 
 
     const handleSelectChat = (id) => {
-        if (selectedChat && selectedChat === id) return;
+        if (selectedChat && selectedChat === id) {
+            onSelectChat(id);
+            return;
+        }
         setSelectedChat(id);
         onSelectChat(id);
         clearEmptySessions();
