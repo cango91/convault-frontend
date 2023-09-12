@@ -24,6 +24,12 @@ export default function ChatHistoryPane({ friendId }) {
                 socket.emit('get-messages', { from: head, session, count: 30 });
             }
             return;
+            // Edge case: if you haven't visited a chat, and you get a few messages in that chat,
+            // but not enough for scroll bar to appear, you will only see the new incoming messages
+            // This check is aimed to ensure that's not the case
+        } else if (messages.length < 30 && messages[messages.length - 1].previous) {
+            socket.emit('get-messages', { from: head, session, count: 30 });
+            return;
         }
     }, [messages, head, session]);
 
@@ -35,7 +41,7 @@ export default function ChatHistoryPane({ friendId }) {
     }, [remainingScroll, session, nextMsg]);
 
     useEffect(() => {
-        if(!messages) return;
+        if (!messages) return;
         const handleScroll = () => {
             if (!lastMessageRef.current) return;
             const lastMessageRect = lastMessageRef.current.getBoundingClientRect();
@@ -74,7 +80,7 @@ export default function ChatHistoryPane({ friendId }) {
                     if (idx === messages.length - 1) {
                         return (
                             <div key={msg._id} ref={lastMessageRef} className={`chat-message ${direction} ${decoration}`}>
-                               <div className="message-content"> {(msg.decryptedContent)}</div>
+                                <div className="message-content"> {(msg.decryptedContent)}</div>
                                 <div className="timestamp">{new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
                             </div>
                         );
@@ -82,7 +88,7 @@ export default function ChatHistoryPane({ friendId }) {
 
                     return (
                         <div key={msg._id} className={`chat-message ${direction} ${decoration}`}>
-                              <div className="message-content"> {(msg.decryptedContent)}</div>
+                            <div className="message-content"> {(msg.decryptedContent)}</div>
                             <div className="timestamp">{new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
 
                         </div>

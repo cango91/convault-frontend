@@ -254,12 +254,12 @@ export function CryptoProvider({ children }) {
             const newKeyPair = { aesKey, recipientEncryptedAesKey, ownEncryptedAesKey };
             setUserKeyMap(prev => ({ ...prev, [userId]: newKeyPair }));
             setSymmetricKeyStore(prev => ({ ...prev, [recipientEncryptedAesKey]: aesKey }));
-            // store on the server
-            return new Promise((resolve,reject)=> {
+            // store on the server, await for server to complete transaction
+            return new Promise((resolve, reject) => {
                 socket.emit('set-key', {
-                key: recipientEncryptedAesKey,
-                value: ownEncryptedAesKey,
-            },()=>resolve(newKeyPair));
+                    key: recipientEncryptedAesKey,
+                    value: ownEncryptedAesKey,
+                }, () => resolve(newKeyPair));
             });
         } catch (error) {
             console.error("Error in manageKeys:", error);
@@ -284,7 +284,7 @@ export function CryptoProvider({ children }) {
         return new Promise((resolve, reject) => {
             socket.emit('get-key', { key: stringKey }, async (response, data) => {
                 if (response !== 'got-key') return reject(data.message);
-                const dec = await decryptSymmetricKey(data.value,privateKey);
+                const dec = await decryptSymmetricKey(data.value, privateKey);
                 setSymmetricKeyStore(prev => ({ ...prev, [stringKey]: dec }));
                 resolve(dec);
             });

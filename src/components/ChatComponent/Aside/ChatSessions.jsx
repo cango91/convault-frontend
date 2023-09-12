@@ -25,14 +25,23 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
     useEffect(() => {
         setSessionsMeta(prev => {
             const friendIds = Object.keys(sessionsCache);
-            return friendIds.map(id => sessionsCache[id].session).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            return friendIds.map(id => {
+                const ret = sessionsCache[id].session;
+                if(!sessionsCache[id].messages || !sessionsCache[id].messages.length){
+                    ret.lastMessageDate = sessionsCache[id].lastMessageDate;
+                }else{
+                    ret.lastMessageDate = sessionsCache[id].messages[0].createdAt
+                }
+                console.log(ret);
+                return ret;
+            }).sort((a, b) => new Date(b.lastMessageDate) - new Date(a.lastMessageDate));
         });
     }, [sessionsCache]);
 
 
 
     const handleSelectChat = (id) => {
-        if(selectedChat && selectedChat===id) return;
+        if (selectedChat && selectedChat === id) return;
         setSelectedChat(id);
         onSelectChat(id);
         clearEmptySessions();
@@ -78,7 +87,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                                             </div>
                                             <div className="chat-meta__sup__date_div">
                                                 <span className="chat-meta__sup__date_span">
-                                                    {(session?.updatedAt ? getRelativeDateString(new Date(session.updatedAt)) : '') || 'N/A'}
+                                                    {(session?.updatedAt ? getRelativeDateString(new Date(session.lastMessageDate)) : '') || 'N/A'}
                                                 </span>
                                             </div>
                                         </div>
