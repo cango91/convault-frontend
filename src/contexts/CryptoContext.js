@@ -200,7 +200,8 @@ export function CryptoProvider({ children }) {
     }
 
     const decryptAESGCM = async (encryptedData, keyOrString) => {
-
+        // const arrayBufferKey = base64ToArrayBuffer(keyOrString);
+        // console.log(`Key length in bits: ${arrayBufferKey.byteLength * 8}`);
         let key;
         if (typeof keyOrString === 'string') {
             // Import the key from the string
@@ -254,11 +255,12 @@ export function CryptoProvider({ children }) {
             setUserKeyMap(prev => ({ ...prev, [userId]: newKeyPair }));
             setSymmetricKeyStore(prev => ({ ...prev, [recipientEncryptedAesKey]: aesKey }));
             // store on the server
-            socket.emit('set-key', {
+            return new Promise((resolve,reject)=> {
+                socket.emit('set-key', {
                 key: recipientEncryptedAesKey,
                 value: ownEncryptedAesKey,
+            },()=>resolve(newKeyPair));
             });
-            return newKeyPair;
         } catch (error) {
             console.error("Error in manageKeys:", error);
         }
@@ -280,10 +282,11 @@ export function CryptoProvider({ children }) {
         if (symmetricKeyStore[stringKey]) return symmetricKeyStore[stringKey];
 
         return new Promise((resolve, reject) => {
-            socket.emit('get-key', { key: stringKey }, (response, data) => {
+            socket.emit('get-key', { key: stringKey }, async (response, data) => {
                 if (response !== 'got-key') return reject(data.message);
-                setSymmetricKeyStore(prev => ({ ...prev, [stringKey]: decode(data.value) }));
-                resolve(decode(data.value));
+                const dec = await decryptSymmetricKey(data.value,privateKey);
+                setSymmetricKeyStore(prev => ({ ...prev, [stringKey]: dec }));
+                resolve(dec);
             });
         });
     };

@@ -273,8 +273,8 @@ export function SocketProvider({ children }) {
                 for (let i = 0; i < messages.length; i++) {
 
                     messages[i].decryptedContent = await manageContent({
-                        content: decode(messages[i].encryptedContent),
-                        key: decode(messages[i].symmetricKey),
+                        content: messages[i].encryptedContent,
+                        key: messages[i].symmetricKey,
                         operation: 'decrypt',
                         direction: messages[i].senderId !== getUser()._id ? 'incoming' : 'outgoing',
                         socket
