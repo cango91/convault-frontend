@@ -6,22 +6,27 @@ import { useSocket } from "../../../../contexts/SocketContext";
 export default function ChatAreaInput({ recipient }) {
     const [msgText, setMsgText] = useState('');
     const input = useRef(null);
-    const { encryptAESGCM, generateSymmetricKeyForSession } = useCrypto();
+    const { manageKeys, manageContent } = useCrypto();
     const { allContacts } = useSocket();
+    const [recipientKey, setRecipientKey] = useState('');
 
-    const encryptMessage = useCallback(async (content, recipientId) => {
-        try {
-            const pk = allContacts.find(c => c.contact._id === recipientId).contact.publicKey;
-            const { aesKey, encryptedAesKey } = await generateSymmetricKeyForSession(recipientId, pk);
-            const encryptedContent = await encryptAESGCM(content, aesKey);
-            return {
-                encryptedContent ,
-                symmetricKey: encryptedAesKey
-            };
-        } catch (error) {
-            console.error(error);
-        }
-    }, [allContacts, encryptAESGCM, generateSymmetricKeyForSession]);
+    useEffect(() => {
+        setRecipientKey(allContacts.find(c => c.contact._id === recipient).contact.publicKey)
+    }, [allContacts, recipient]);
+
+    // const encryptMessage = useCallback(async (content, recipientId) => {
+    //     try {
+    //         const pk = allContacts.find(c => c.contact._id === recipientId).contact.publicKey;
+    //         const { aesKey, encryptedAesKey } = await generateSymmetricKeyForSession(recipientId, pk);
+    //         const encryptedContent = await encryptAESGCM(content, aesKey);
+    //         return {
+    //             encryptedContent ,
+    //             symmetricKey: encryptedAesKey
+    //         };
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // }, [allContacts, encryptAESGCM, generateSymmetricKeyForSession]);
 
     useEffect(() => {
         const textarea = input.current;
@@ -41,13 +46,24 @@ export default function ChatAreaInput({ recipient }) {
         setMsgText(e.target.value);
     }
 
-    const onSubmit = async e => {
+    const onSubmit = useCallback(async e => {
         e.preventDefault();
-        // socket.emit('send-message', { recipient, content: msgText });
-        const { encryptedContent, symmetricKey } = await encryptMessage(msgText, recipient);
-        socket.emit('send-encrypted', { recipient, encryptedContent, symmetricKey });
+        const keyPair = await manageKeys(recipient, recipientKey, socket);
+        const encryptedContent = await manageContent({
+            content: msgText,
+            key: keyPair.recipientEncryptedAesKey,
+            operation: 'encrypt',
+            direction: 'outgoing',
+            socket
+        });
+        socket.emit('send-encrypted', {
+            encryptedContent,
+            recipient,
+            symmetricKey: keyPair.recipientEncryptedAesKey,
+            storedKey: keyPair.ownEncreyptedAesKey
+        });
         setMsgText('');
-    }
+    }, [manageContent, manageKeys, recipient, recipientKey, msgText]);
 
     const handleKeyDown = e => {
         if (e.ctrlKey || e.metaKey || e.shiftKey) {

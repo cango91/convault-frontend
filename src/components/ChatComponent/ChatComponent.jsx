@@ -92,7 +92,7 @@ export default function ChatComponent() {
             case 'chat':
                 // find an existing chat . If no existing chat, set a temporary one
                 setSwitchToChat(data.contact._id);
-                if (!(data.contact._id in sessionsCache) || !sessionsMeta.find(s => s.user1 === data.contact._id || s.user2 === data.contact._id)) {
+                if (!(data.contact._id in sessionsCache) || !sessionsMeta?.find(s => s.user1 === data.contact._id || s.user2 === data.contact._id)) {
                     createEmptySession(data.contact._id);
                 }
                 setActiveScreen('main');

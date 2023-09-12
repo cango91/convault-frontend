@@ -15,7 +15,7 @@ export default function ChatHistoryPane({ friendId }) {
     const messages = sessionsCache[friendId]?.messages;
     const head = sessionsCache[friendId]?.session?.head;
     const session = sessionsCache[friendId]?.session?._id;
-    const nextMsg = (messages.length && messages[messages.length - 1]?.previous) || null;
+    const nextMsg = (messages?.length && messages[messages.length - 1]?.previous) || null;
 
     useEffect(() => {
         if (!head || !messages) return;

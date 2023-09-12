@@ -22,7 +22,7 @@ export function SocketProvider({ children }) {
     const [friendRequestError, setFriendRequestError] = useState('');
     const [sendMessageError, setSendMessageError] = useState('');
     const { decryptAESGCM, decryptSymmetricKey,
-        privateKey, manageContent, getKey,  } = useCrypto();
+        privateKey, manageContent } = useCrypto();
 
     useEffect(() => {
         function onConnect() {
@@ -180,7 +180,13 @@ export function SocketProvider({ children }) {
 
         async function onMessageSent({ data }) {
             //const decryptedMessage = await decryptMessage(data.message);
-            const decryptedMessage = await manageContent()
+            const decryptedMessage = await manageContent({
+                content: decode(data.message.encryptedContent),
+                key: decode(data.message.symmetricKey),
+                operation: 'decrypt',
+                direction: 'outgoing',
+                socket
+            });
             data.message.decryptedContent = decryptedMessage;
             if (!(data.message.recipientId in sessionsCache)) {
                 setSessionsCache(prev => ({
@@ -217,7 +223,13 @@ export function SocketProvider({ children }) {
 
         }
         async function onMessageReceived({ data }) {
-            data.message.decryptedContent = await decryptMessage(data.message);
+            data.message.decryptedContent = await manageContent({
+                content: decode(data.message.encryptedContent),
+                key: decode(data.message.symmetricKey),
+                operation: 'decrypt',
+                direction: 'incoming',
+                socket
+            });
             if (!(data.message.senderId in sessionsCache)) {
                 setSessionsCache(prev => ({
                     ...prev,
@@ -259,7 +271,14 @@ export function SocketProvider({ children }) {
                 }
                 messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 for (let i = 0; i < messages.length; i++) {
-                    messages[i].decryptedContent = await decryptMessage(messages[i]);
+
+                    messages[i].decryptedContent = await manageContent({
+                        content: decode(messages[i].encryptedContent),
+                        key: decode(messages[i].symmetricKey),
+                        operation: 'decrypt',
+                        direction: messages[i].senderId !== getUser()._id ? 'incoming' : 'outgoing',
+                        socket
+                    });
                 }
                 setSessionsCache(prev => {
                     if (prev[owningKey]._fetched && prev[owningKey]._fetched.length) {
@@ -288,7 +307,6 @@ export function SocketProvider({ children }) {
             }
         }
 
-
         /** CHATS */
         // socket.on('send-message', onSendMessage);
         socket.on('all-sessions', onAllSessions);
@@ -308,8 +326,7 @@ export function SocketProvider({ children }) {
             socket.off('messages-retrieved', onMessagesRetrieved);
         }
 
-
-    }, [sessionsCache, sessionKeyStore, privateKey, decryptAESGCM, decryptSymmetricKey]);
+    }, [sessionsCache, manageContent, privateKey, decryptAESGCM, decryptSymmetricKey]);
 
     const resetFriendRequestError = () => setFriendRequestError('');
     const resetSendMessageError = () => setSendMessageError('');

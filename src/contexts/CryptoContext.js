@@ -143,9 +143,9 @@ export function CryptoProvider({ children }) {
         );
     }
 
-    const encryptSymmetrickey = useCallback(async (aesKey, recipientPublicKey) => {
+    const encryptSymmetrickey = useCallback(async (aesKey, recipientPublicKey, importPEM = true) => {
         const exportedAESKey = await window.crypto.subtle.exportKey("raw", aesKey);
-        const publicKey = await importRecipientKey(recipientPublicKey)
+        const publicKey = importPEM ? await importRecipientKey(recipientPublicKey) : recipientPublicKey
         const encryptedAESKey = await window.crypto.subtle.encrypt(
             {
                 name: "RSA-OAEP",
@@ -199,7 +199,24 @@ export function CryptoProvider({ children }) {
         return arrayBufferToBase64(fullBuffer.buffer);
     }
 
-    const decryptAESGCM = async (encryptedData, key) => {
+    const decryptAESGCM = async (encryptedData, keyOrString) => {
+
+        let key;
+        if (typeof keyOrString === 'string') {
+            // Import the key from the string
+            key = await window.crypto.subtle.importKey(
+                "raw",
+                base64ToArrayBuffer(keyOrString),
+                "AES-GCM",
+                true,
+                ["decrypt"]
+            );
+        } else if (keyOrString instanceof CryptoKey) {
+            // Use the key as is
+            key = keyOrString;
+        } else {
+            throw new Error("Invalid key format");
+        }
         const fullBuffer = base64ToArrayBuffer(encryptedData);
 
         // Deconcatenate
@@ -219,7 +236,7 @@ export function CryptoProvider({ children }) {
         return dec.decode(decryptedData);
     }
 
-    const deleteAesKeys = () => { 
+    const deleteAesKeys = () => {
         setUserKeyMap({});
         setSymmetricKeyStore({});
     }
@@ -231,11 +248,11 @@ export function CryptoProvider({ children }) {
         if (userId in userKeyMap) return userKeyMap[userId];
         try {
             const aesKey = await generateSymmetricKey();
-            const ownEncryptedAesKey = await encryptSymmetrickey(aesKey, publicKey);
+            const ownEncryptedAesKey = await encryptSymmetrickey(aesKey, publicKey, false);
             const recipientEncryptedAesKey = await encryptSymmetrickey(aesKey, userPublicKey);
             const newKeyPair = { aesKey, recipientEncryptedAesKey, ownEncryptedAesKey };
             setUserKeyMap(prev => ({ ...prev, [userId]: newKeyPair }));
-            setSymmetricKeyStore(prev => ({ ...prev, recipientEncryptedAesKey: aesKey }));
+            setSymmetricKeyStore(prev => ({ ...prev, [recipientEncryptedAesKey]: aesKey }));
             // store on the server
             socket.emit('set-key', {
                 key: recipientEncryptedAesKey,
@@ -247,20 +264,39 @@ export function CryptoProvider({ children }) {
         }
     }, [publicKey, userKeyMap, encryptSymmetrickey]);
 
+    const exportCryptoKey = async (cryptoKey) => {
+        const exportedKeyBuffer = await window.crypto.subtle.exportKey("raw", cryptoKey);
+        return arrayBufferToBase64(exportedKeyBuffer); // Assuming you have arrayBufferToBase64 function
+    };
+
     const getKey = async (key, socket) => {
-        if (symmetricKeyStore[key]) return symmetricKeyStore[key];
+        let stringKey;
+        if (typeof key !== "string") {
+            stringKey = await exportCryptoKey(key);
+        } else {
+            stringKey = key;
+        }
+
+        if (symmetricKeyStore[stringKey]) return symmetricKeyStore[stringKey];
+
         return new Promise((resolve, reject) => {
-            socket.emit('get-key', { key }, (response, data) => {
+            socket.emit('get-key', { key: stringKey }, (response, data) => {
                 if (response !== 'got-key') return reject(data.message);
-                setSymmetricKeyStore(prev => ({ ...prev, [key]: data.value }));
-                resolve(data.value);
+                setSymmetricKeyStore(prev => ({ ...prev, [stringKey]: decode(data.value) }));
+                resolve(decode(data.value));
             });
         });
     };
 
-    const manageContent = async ({ content, key, operation, socket }) => {
+
+    const manageContent = async ({ content, key, operation, socket, direction = 'incoming' }) => {
         try {
-            const decryptedKey = await getKey(key, socket);
+            let decryptedKey;
+            if (direction === 'incoming') {
+                decryptedKey = await decryptSymmetricKey(key, privateKey);
+            } else {
+                decryptedKey = await getKey(key, socket);
+            }
             return operation === 'encrypt'
                 ? encryptAESGCM(content, decryptedKey)
                 : decryptAESGCM(content, decryptedKey);
