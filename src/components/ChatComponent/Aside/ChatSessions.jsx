@@ -32,7 +32,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                 }else{
                     ret.lastMessageDate = sessionsCache[id].messages[0].createdAt
                 }
-                console.log(ret);
+                // console.log(ret);
                 return ret;
             }).sort((a, b) => new Date(b.lastMessageDate) - new Date(a.lastMessageDate));
         });
@@ -95,7 +95,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                                             </div>
                                         </div>
                                         <div className="chat-meta__meta__sub">
-
+                                        
                                         </div>
                                     </div>
                                 </div>

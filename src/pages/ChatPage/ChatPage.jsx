@@ -8,18 +8,18 @@ import ChatComponent from '../../components/ChatComponent/ChatComponent';
 export default function ChatPage() {
     const { privateKey } = useCrypto();
     return (
-        <>
-            <SocketProvider>
-                {privateKey &&
-                        <ChatComponent />
-                }
-                {
-                    !privateKey &&
-                    <>
+
+        <SocketProvider>
+            {privateKey &&
+                <ChatComponent />
+            }
+            {
+                !privateKey &&
+                <>
                     <LogoutButton />
-                        <PrivKeySetter />
-                    </>
-                }
-            </SocketProvider> </>
+                    <PrivKeySetter />
+                </>
+            }
+        </SocketProvider>
     );
 }

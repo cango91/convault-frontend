@@ -180,13 +180,18 @@ export function SocketProvider({ children }) {
 
         async function onMessageSent({ data }) {
             //const decryptedMessage = await decryptMessage(data.message);
-            const decryptedMessage = await manageContent({
-                content: decode(data.message.encryptedContent),
-                key: decode(data.message.symmetricKey),
-                operation: 'decrypt',
-                direction: 'outgoing',
-                socket
-            });
+            let decryptedMessage;
+            if (data.message.encryptedContent) {
+                decryptedMessage = await manageContent({
+                    content: decode(data.message.encryptedContent),
+                    key: decode(data.message.symmetricKey),
+                    operation: 'decrypt',
+                    direction: 'outgoing',
+                    socket
+                });
+            } else {
+                decryptedMessage = "";
+            }
             data.message.decryptedContent = decryptedMessage;
             if (!(data.message.recipientId in sessionsCache)) {
                 setSessionsCache(prev => ({
@@ -223,13 +228,17 @@ export function SocketProvider({ children }) {
 
         }
         async function onMessageReceived({ data }) {
-            data.message.decryptedContent = await manageContent({
-                content: decode(data.message.encryptedContent),
-                key: decode(data.message.symmetricKey),
-                operation: 'decrypt',
-                direction: 'incoming',
-                socket
-            });
+            if (data.message.encryptedContent) {
+                data.message.decryptedContent = await manageContent({
+                    content: decode(data.message.encryptedContent),
+                    key: decode(data.message.symmetricKey),
+                    operation: 'decrypt',
+                    direction: 'incoming',
+                    socket
+                });
+            } else {
+                data.message.decryptedContent = "";
+            }
             if (!(data.message.senderId in sessionsCache)) {
                 setSessionsCache(prev => ({
                     ...prev,
@@ -271,7 +280,7 @@ export function SocketProvider({ children }) {
                 }
                 messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 for (let i = 0; i < messages.length; i++) {
-
+                    if(messages[i].encryptedContent){
                     messages[i].decryptedContent = await manageContent({
                         content: messages[i].encryptedContent,
                         key: messages[i].symmetricKey,
@@ -279,6 +288,9 @@ export function SocketProvider({ children }) {
                         direction: messages[i].senderId !== getUser()._id ? 'incoming' : 'outgoing',
                         socket
                     });
+                }else{
+                    messages[i].decryptedContent = "";
+                }
                 }
                 setSessionsCache(prev => {
                     if (prev[owningKey]._fetched && prev[owningKey]._fetched.length) {
@@ -307,6 +319,34 @@ export function SocketProvider({ children }) {
             }
         }
 
+        function onMessageDeleted({ id, other }) {
+            console.log(other);
+            console.log(id);
+            setSessionsCache(prev => {
+                const messages = [...(prev[other].messages)];
+                const idx = messages.findIndex(msg => msg._id===id);
+                if(idx<0){
+                    return prev;
+                }
+                const msg = { ...prev[other].messages[idx] };
+                msg.encryptedContent = "";
+                msg.decryptedContent = "";
+                if (msg.senderId === getUser()._id) {
+                    msg.isDeletedSender = true;
+                }
+                msg.isDeletedRecipient = true;
+                return {
+                    ...prev,
+                    [other]: {
+                        ...prev[other],
+                        messages: messages.slice(0, idx).concat([msg], messages.slice(idx + 1)),
+                    }
+                }
+            });
+        }
+
+
+
         /** CHATS */
         // socket.on('send-message', onSendMessage);
         socket.on('all-sessions', onAllSessions);
@@ -314,6 +354,7 @@ export function SocketProvider({ children }) {
         socket.on('message-delivered', onMessageDelivered);
         socket.on('message-read', onMessageRead);
         socket.on('message-received', onMessageReceived);
+        socket.on('message-deleted', onMessageDeleted);
         socket.on('messages-retrieved', onMessagesRetrieved);
 
         return () => {
@@ -323,6 +364,7 @@ export function SocketProvider({ children }) {
             socket.off('message-delivered', onMessageDelivered);
             socket.off('message-read', onMessageRead);
             socket.off('message-received', onMessageReceived);
+            socket.off('message-deleted', onMessageDeleted);
             socket.off('messages-retrieved', onMessagesRetrieved);
         }
 
