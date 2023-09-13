@@ -1,70 +1,56 @@
-# Getting Started with Create React App
+# 💬🔐 Convault
+**End-to-end encrypted, real-time chat app**
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Convault acts as a vault for your private conversations, putting the keys to your messages directly in your hands.
 
-## Available Scripts
+![splash screen](https://i.imgur.com/aAOXSvn.png)
 
-In the project directory, you can run:
+## Getting Started
+[Link to live site](https://convault-d603666b3d0b.herokuapp.com/): To use Convault, sign up and get started. You'll need your friends' handles to chat with them. Due to our focus on privacy, the MVP does not include a user search feature; however, it's planned for inclusion in the icebox once profile settings are developed.
 
-### `npm start`
+**For security, ensure your password has:**
++ A minimum of 8 characters
++ At least one uppercase letter
++ At least one lowercase letter
++ A minimum of one digit
++ At least one special character
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Upon signing up, a private/public key pair will be created. You'll be prompted to store your private key securely and present it in subsequent sessions. This step is crucial; the MVP doesn't provide a method to recreate your key pair. If lost, access to previous messages is forfeited.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+![Keygen Info](https://i.imgur.com/xhQcagz.png)
 
-### `npm test`
+## Security Features
++ **End-to-end Encryption:** All data is encrypted client-side, with you holding the decryption key.
++ **Short-lived JWTs (Json Web Tokens):** Tokens for user authentication expire in 30 seconds, minimizing risks from compromised tokens.
++ **Data Breach Mitigation:** Reconstructing even the metadata of conversations is challenging. We use references to the last message between users, with each message referring to its predecessor. All references, including timestamps, are encrypted. However, this design impacts performance.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Technologies Utilized
++ Mongo
++ Express
++ Node
++ React
++ Web Cryptography API
++ Socket.io
 
-### `npm run build`
+## Roadmap
+[Link to Trello]
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Screenshots
+![friend request](https://i.imgur.com/hrpHbqmm.png)
+![friends list](https://i.imgur.com/onwZbvgm.png)
+![a conversation between Duke Nukem and John Locke](https://i.imgur.com/kxlzo9w.png)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Icebox Features
++ Improved error messages
++ Password reset functionality
++ Username search
++ Profile settings for search visibility
++ Options for user blocking
++ Capability to reject friend requests
++ Notifications and unread message count
++ Perfect Forward Secrecy mode
++ Browser extension for secure private key management
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Repos
++ [Backend](https://github.com/cango91/convault-backend) on GitHub
++ [Frontend](https://github.com/cango91/convault-frontend) on GitHub
