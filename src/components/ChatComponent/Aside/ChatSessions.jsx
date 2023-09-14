@@ -14,6 +14,19 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
     const popupRef = useRef(null);
     const caretRefObj = useRef({});
 
+    const updateFavicon = (unreadCount) => {
+        const linkEl = document.querySelector("link[rel~='icon']");
+        if (!linkEl) return;
+        if(unreadCount > 9) unreadCount="9+"
+        const newFaviconData = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22><tspan dx=%22-5%22>💬</tspan><tspan font-size=%2250%22 dy=%2210%22 dx=%22-55%22>🔐</tspan></text>${unreadCount ? `<circle cx=%2260%22 cy=%2235%22 r=%2235%22 fill=%22%2300a884%22></circle><text x=%2260%22 y=%2250%22 font-size=%2250%22 fill=%22%23FFFFFF%22 text-anchor=%22middle%22>${unreadCount}</text>` : ''}</svg>`;
+
+        linkEl.href = newFaviconData;
+    }
+    /*
+    <circle cx=%2210%22 cy=%2210%22 r=%2210%22 fill=%22#00a884%22></circle>
+        <text x=%2210%22 y=%2215%22 font-size=%2215%22 fill=%22#FFFFFF%22 text-anchor=%22middle%22>${unreadCount}</text>
+    */
+
     useEffect(() => {
         if (selectChat) {
             setSelectedChat(selectChat);
@@ -41,6 +54,8 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                 return ret;
             }).sort((a, b) => new Date(b.lastMessageDate) - new Date(a.lastMessageDate));
         });
+        const totalUnread = Object.values(sessionsCache).reduce((acc, el) => acc + el.unreadCount, 0);
+        updateFavicon(totalUnread);
     }, [sessionsCache]);
 
     // background click to close 
@@ -72,7 +87,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
     const revealPopup = (id) => {
         if (id === selectedChat) {
             setShowPopup(!showPopup);
-        }else{
+        } else {
             setShowPopup(true);
         }
     }
