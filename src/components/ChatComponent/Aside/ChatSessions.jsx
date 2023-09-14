@@ -27,11 +27,12 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
             const friendIds = Object.keys(sessionsCache);
             return friendIds.map(id => {
                 const ret = sessionsCache[id].session;
-                if(!sessionsCache[id].messages || !sessionsCache[id].messages.length){
+                if (!sessionsCache[id].messages || !sessionsCache[id].messages.length) {
                     ret.lastMessageDate = sessionsCache[id].lastMessageDate;
-                }else{
+                } else {
                     ret.lastMessageDate = sessionsCache[id].messages[0].createdAt
                 }
+                ret.unreadCount = sessionsCache[id].unreadCount;
                 // console.log(ret);
                 return ret;
             }).sort((a, b) => new Date(b.lastMessageDate) - new Date(a.lastMessageDate));
@@ -73,7 +74,9 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                 {
                     !!sessionsMeta.length && sessionsMeta.map(session => {
                         const userId = session.user1 === getUser()._id ? session.user2 : session.user1;
-                        const username = allContacts.find(item => item.contact._id === userId).contact.username;
+                        const contact = allContacts.find(item => item.contact._id === userId).contact
+                        const username = contact.username;
+                        const unreadCount = session.unreadCount;
                         return (
                             <div className={`message-item`}
                                 key={`meta_${username}`}
@@ -89,13 +92,19 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                                                 </span>
                                             </div>
                                             <div className="chat-meta__sup__date_div">
-                                                <span className="chat-meta__sup__date_span">
+                                                <span className={`chat-meta__sup__date_span ${unreadCount ? 'unread' : ''}`}>
                                                     {(session?.updatedAt ? getRelativeDateString(new Date(session.lastMessageDate)) : '') || 'N/A'}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="chat-meta__meta__sub">
-                                        
+                                            {!!unreadCount &&
+                                                <div className="chat-meta__meta__sub__unread">
+                                                    <span className="chat-meta__meta__sub__unread-badge">
+                                                        {unreadCount}
+                                                    </span>
+                                                </div>
+                                                }
                                         </div>
                                     </div>
                                 </div>

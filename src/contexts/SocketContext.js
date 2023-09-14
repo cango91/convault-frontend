@@ -388,10 +388,10 @@ export function SocketProvider({ children }) {
     }
     const markRead = (senderId) => {
         if (senderId in sessionsCache) {
-            const readMsgIds = sessionsCache[senderId].messages.filter(msg => msg.recipientId === getUser()._id && msg.status !== "read");
-            if (readMsgIds.length) {
-                socket.emit('messages-read', { ...readMsgIds });
-            }
+            // const readMsgIds = sessionsCache[senderId].messages.filter(msg => msg.recipientId === getUser()._id && msg.status !== "read");
+            // if (readMsgIds.length) {
+            //     socket.emit('messages-read', { ...readMsgIds });
+            // }
             setSessionsCache(prev => ({
                 ...prev,
                 [senderId]: {

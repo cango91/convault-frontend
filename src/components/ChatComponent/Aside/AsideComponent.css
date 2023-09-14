@@ -342,9 +342,39 @@ aside {
     font-size: 13px;
     line-height: 20px;
     margin-top: 2px;
+    justify-content: flex-end;
 }
 
+.chat-meta__meta__sub__unread{
+    flex: none;
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 600;
+    min-width: 1.1em;
+    display: block;
+}
 
+.chat-meta__meta__sub__unread-badge{
+    text-align: center;
+    background-color: var(--unread-timestamp);
+    padding: 0.3em 0.4em;
+    border-top-right-radius: 1.1em;
+    border-top-left-radius: 1.1em;
+    border-bottom-left-radius: 1.1em;
+    border-bottom-right-radius: 1.1em;
+    min-width: 0.8em;
+    line-height: 1;
+    min-height: 1em;
+    font-size: 0.75rem;
+    display: block;
+    color: #111b21;
+}
+
+.unread{
+    color: var(--unread-timestamp);
+    font-weight: 800;
+}
 
 
 .send-fr-link {

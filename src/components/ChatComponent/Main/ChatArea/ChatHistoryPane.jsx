@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../../contexts/SocketContext";
 import { socket } from "../../../../socket";
 import { getUser } from "../../../../utilities/services/user-service";
 import { decode } from 'he';
 import { trimWhiteSpace } from "../../../../utilities/utils";
+import ChatSessions from "../../Aside/ChatSessions";
 
 export default function ChatHistoryPane({ friendId }) {
-    const { sessionsCache } = useSocket();
+    const { sessionsCache, markRead } = useSocket();
     const [remainingScroll, setRemainingScroll] = useState(301);
     const [showPopup, setShowPopup] = useState(false);
     const [selectedMessage, setSelectedMessage] = useState('');
@@ -76,6 +77,34 @@ export default function ChatHistoryPane({ friendId }) {
     useEffect(() => {
         if (!showPopup) setSelectedMessage('');
     }, [showPopup]);
+
+
+    // const getUnreadMessages = useCallback(() => {
+    //     if (!sessionsCache || !friendId || !sessionsCache[friendId] || !sessionsCache[friendId].messages || !sessionsCache[friendId].messages.length) return [];
+    //     return sessionsCache[friendId].messages.filter((msg) => !msg.isDeletedRecipient && msg.senderId === friendId && !["deleted","read"].includes(msg.status)  );
+    // }, [sessionsCache, friendId]);
+
+    // useEffect(() => {
+    //     const unread = getUnreadMessages();
+    //     if(unread.length){
+    //         socket.emit("read")
+    //     }
+    // }, [getUnreadMessages]);
+
+    // useEffect(() => {
+    //     if (!friendId || !sessionsCache || !sessionsCache[friendId] || !sessionsCache[[friendId].unreadCount]) return;
+    //     // if (sessionsCache[friendId].messages.some(msg => msg.senderId === friendId && !["deleted", "read"].includes(msg.status) && !msg.isDeletedRecipient)) {
+    //     socket.emit('read-messages', { senderId: friendId });
+    //     markRead(friendId);
+    //     console.log('i call you')
+
+    // }, [friendId, sessionsCache, markRead]);
+
+    useEffect(() => {
+        if (!friendId || !sessionsCache || !sessionsCache[friendId]?.unreadCount) return;
+        socket.emit('read-messages', { senderId: friendId });
+        markRead(friendId);
+    }, [sessionsCache, friendId]);
 
 
 
