@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSocket } from "../../../contexts/SocketContext";
 import { getUser } from "../../../utilities/services/user-service";
 import { getRelativeDateString } from "../../../utilities/utils";
+import { socket } from "../../../socket";
 
 export default function ChatSessions({ onSelectChat, selectChat, clearSelection, onClearedSelection }) {
     const [selectedChat, setSelectedChat] = useState('');
     const [sessionsMeta, setSessionsMeta] = useState([]);
     const [filteredChats, setFilteredChats] = useState([]);
+    const [showPopup, setShowPopup] = useState(false);
     const { allContacts, sessionsCache, clearEmptySessions } = useSocket();
+
+    const popupRef = useRef(null);
+    const caretRefObj = useRef({});
 
     useEffect(() => {
         if (selectChat) {
@@ -33,11 +38,24 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                     ret.lastMessageDate = sessionsCache[id].messages[0].createdAt
                 }
                 ret.unreadCount = sessionsCache[id].unreadCount;
-                // console.log(ret);
                 return ret;
             }).sort((a, b) => new Date(b.lastMessageDate) - new Date(a.lastMessageDate));
         });
     }, [sessionsCache]);
+
+    // background click to close 
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (popupRef.current && !popupRef.current.contains(e.target)) {
+                if (caretRefObj.current && !Object.values(caretRefObj.current).some(val => val.contains(e.target)))
+                    setShowPopup(false);
+            }
+
+        }
+        document.addEventListener('mouseup', handleClickOutside);
+        return () => document.removeEventListener('mouseup', handleClickOutside);
+
+    }, []);
 
 
 
@@ -49,6 +67,19 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
         setSelectedChat(id);
         onSelectChat(id);
         clearEmptySessions();
+    }
+
+    const revealPopup = (id) => {
+        if (id === selectedChat) {
+            setShowPopup(!showPopup);
+        }else{
+            setShowPopup(true);
+        }
+    }
+
+
+    const handleDeleteThread = () => {
+        socket.emit('delete-thread', { session: sessionsCache[selectedChat].session._id });
     }
 
 
@@ -72,7 +103,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                     </div>
                 }
                 {
-                    !!sessionsMeta.length && sessionsMeta.map(session => {
+                    !!sessionsMeta.length && sessionsMeta.map((session, idx) => {
                         const userId = session.user1 === getUser()._id ? session.user2 : session.user1;
                         const contact = allContacts.find(item => item.contact._id === userId).contact
                         const username = contact.username;
@@ -85,6 +116,12 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                                         <img src="user-filled-white.svg" className="profile-pic" alt="profile pic" />
                                     </div>
                                     <div className="chat-meta__meta">
+                                        <div className="popup"
+                                            ref={popupRef}
+                                            style={{ display: showPopup && userId === selectedChat ? 'block' : 'none' }}>
+                                            <button onClick={handleDeleteThread} className="popup-btn">Delete Conversation</button>
+                                        </div>
+                                        <div className="caret" ref={el => caretRefObj.current[userId] = el} onClick={() => revealPopup(userId)}>‸</div>
                                         <div className="chat-meta__meta__sup">
                                             <div className="chat-meta__meta__sup__username_div">
                                                 <span className="chat-meta__meta__sup__username_span">
@@ -104,7 +141,7 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
                                                         {unreadCount}
                                                     </span>
                                                 </div>
-                                                }
+                                            }
                                         </div>
                                     </div>
                                 </div>

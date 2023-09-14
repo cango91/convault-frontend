@@ -280,17 +280,17 @@ export function SocketProvider({ children }) {
                 }
                 messages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 for (let i = 0; i < messages.length; i++) {
-                    if(messages[i].encryptedContent){
-                    messages[i].decryptedContent = await manageContent({
-                        content: messages[i].encryptedContent,
-                        key: messages[i].symmetricKey,
-                        operation: 'decrypt',
-                        direction: messages[i].senderId !== getUser()._id ? 'incoming' : 'outgoing',
-                        socket
-                    });
-                }else{
-                    messages[i].decryptedContent = "";
-                }
+                    if (messages[i].encryptedContent) {
+                        messages[i].decryptedContent = await manageContent({
+                            content: messages[i].encryptedContent,
+                            key: messages[i].symmetricKey,
+                            operation: 'decrypt',
+                            direction: messages[i].senderId !== getUser()._id ? 'incoming' : 'outgoing',
+                            socket
+                        });
+                    } else {
+                        messages[i].decryptedContent = "";
+                    }
                 }
                 setSessionsCache(prev => {
                     if (prev[owningKey]._fetched && prev[owningKey]._fetched.length) {
@@ -320,12 +320,10 @@ export function SocketProvider({ children }) {
         }
 
         function onMessageDeleted({ id, other }) {
-            console.log(other);
-            console.log(id);
             setSessionsCache(prev => {
                 const messages = [...(prev[other].messages)];
-                const idx = messages.findIndex(msg => msg._id===id);
-                if(idx<0){
+                const idx = messages.findIndex(msg => msg._id === id);
+                if (idx < 0) {
                     return prev;
                 }
                 const msg = { ...prev[other].messages[idx] };
@@ -345,6 +343,21 @@ export function SocketProvider({ children }) {
             });
         }
 
+        function onThreadDeleted({ session }) {
+            let owningKey = null;
+            for (const [key, value] of Object.entries(sessionsCache)) {
+                if (value.session?._id === session) {
+                    owningKey = key;
+                    break;
+                }
+            }
+            if(owningKey){
+                const prev = {...sessionsCache};
+                delete prev[owningKey];
+                setSessionsCache(prev);
+            }
+        }
+
 
 
         /** CHATS */
@@ -356,6 +369,7 @@ export function SocketProvider({ children }) {
         socket.on('message-received', onMessageReceived);
         socket.on('message-deleted', onMessageDeleted);
         socket.on('messages-retrieved', onMessagesRetrieved);
+        socket.on('thread-deleted', onThreadDeleted);
 
         return () => {
             // socket.off('send-message', onSendMessage);
@@ -366,6 +380,7 @@ export function SocketProvider({ children }) {
             socket.off('message-received', onMessageReceived);
             socket.off('message-deleted', onMessageDeleted);
             socket.off('messages-retrieved', onMessagesRetrieved);
+            socket.off('thread-deleted', onThreadDeleted);
         }
 
     }, [sessionsCache, manageContent, privateKey, decryptAESGCM, decryptSymmetricKey]);

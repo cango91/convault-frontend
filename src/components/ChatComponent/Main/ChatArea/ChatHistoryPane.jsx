@@ -15,7 +15,6 @@ export default function ChatHistoryPane({ friendId }) {
     const chatContainerRef = useRef(null);
     const lastMessageRef = useRef(null);
     const popupRef = useRef(null);
-    const caretRef = useRef(null);
 
     const messages = sessionsCache[friendId]?.messages;
     const head = sessionsCache[friendId]?.session?.head;
@@ -64,7 +63,6 @@ export default function ChatHistoryPane({ friendId }) {
     // background click to close 
     useEffect(() => {
         const handleClickOutside = (e) => {
-            // if (caretRef.current && caretRef.current.contains(e.target)) return;
             if (popupRef.current && !popupRef.current.contains(e.target)) {
                 setShowPopup(false);
             }
@@ -167,7 +165,7 @@ export default function ChatHistoryPane({ friendId }) {
                                 </div>
                                 <div className="timestamp">
                                     {new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                                    <div onClick={(e) => handleCaretClick(msg.encryptedContent ? msg._id : '', e)} className="caret" ref={caretRef}>‸</div>
+                                    <div onClick={(e) => handleCaretClick(msg.encryptedContent ? msg._id : '', e)} className="caret">‸</div>
                                 </div>
                             </div>
                         );
@@ -189,7 +187,7 @@ export default function ChatHistoryPane({ friendId }) {
                             </div>
                             <div className="timestamp">
                                 {new Date(msg.createdAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                                <div onClick={(e) => handleCaretClick(msg.encryptedContent ? msg._id : '', e)} className="caret" ref={caretRef}>‸</div>
+                                <div onClick={(e) => handleCaretClick(msg.encryptedContent ? msg._id : '', e)} className="caret">‸</div>
                             </div>
                         </div>
                     );
