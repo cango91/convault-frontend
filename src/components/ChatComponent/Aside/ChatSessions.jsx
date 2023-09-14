@@ -22,10 +22,6 @@ export default function ChatSessions({ onSelectChat, selectChat, clearSelection,
 
         linkEl.href = newFaviconData;
     }
-    /*
-    <circle cx=%2210%22 cy=%2210%22 r=%2210%22 fill=%22#00a884%22></circle>
-        <text x=%2210%22 y=%2215%22 font-size=%2215%22 fill=%22#FFFFFF%22 text-anchor=%22middle%22>${unreadCount}</text>
-    */
 
     useEffect(() => {
         if (selectChat) {
