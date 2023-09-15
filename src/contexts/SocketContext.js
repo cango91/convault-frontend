@@ -368,7 +368,7 @@ export function SocketProvider({ children }) {
                         icon: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22><tspan dx=%22-5%22>💬</tspan><tspan font-size=%2250%22 dy=%2210%22 dx=%22-55%22>🔐</tspan></text></svg>"
                     });
                     notification.onclick = () => function () {
-                        window.open("http://localhost:3000/chat");
+                        window.open("https://convault-d603666b3d0b.herokuapp.com/chat");
                     }
                     new Audio('notification.mp3').play();
                 }

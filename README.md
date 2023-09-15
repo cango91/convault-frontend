@@ -47,7 +47,7 @@ Upon signing up, a private/public key pair will be created. You'll be prompted t
 + Profile settings for search visibility
 + Options for user blocking
 + Capability to reject friend requests
-+ Notifications and unread message count
++ ~~Notifications and unread message count~~
 + Perfect Forward Secrecy mode
 + Browser extension for secure private key management
 
