@@ -14,8 +14,9 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
     const [error, setError] = useState('');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [selectedChat, setSelectedChat] = useState('');
+    const [notifications, setNotifications] = useState({ messages: false, friends: false });
     const asideComponent = useRef(null);
-    const { allContacts, friendRequestError, resetFriendRequestError, clearEmptySessions } = useSocket();
+    const { allContacts, friendRequestError, resetFriendRequestError, clearEmptySessions, sessionsCache } = useSocket();
     const logout = useLogout();
     const settingsIconRef = useRef(null);
     const dropdownRef = useRef(null);
@@ -38,7 +39,7 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
 
     /** Tabs Switched */
     const handleTabSwitch = (tab) => {
-        if(tab===activeTab) return;
+        if (tab === activeTab) return;
         setActiveTab(tab);
         clearEmptySessions();
         onTabSwitched();
@@ -115,6 +116,10 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
     }, []);
 
 
+    const showMsg = Object.values(sessionsCache).some(el => el.unreadCount);
+
+    const newFrd = allContacts.some(el => el.friendRequest.direction === 'received' && el.friendRequest.status === 'pending');
+
 
     return (
         <aside className={`aside-component ${fullscreen && !active ? 'd-none' : fullscreen && active ? 'w-100' : ''}`} ref={asideComponent}>
@@ -138,13 +143,13 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
                     className={`tab ${activeTab === 'chats' ? 'active' : ''}`}
                     onClick={() => handleTabSwitch('chats')}
                 >
-                    Chats
+                    <span>Chats</span><span className={`notification-circle ${!showMsg ? 'invisible' : ''}`}></span>
                 </button>
                 <button
                     className={`tab ${activeTab === 'friends' ? 'active' : ''}`}
                     onClick={() => handleTabSwitch('friends')}
                 >
-                    Friends
+                    <span>Friends</span><span className={`notification-circle ${!newFrd ? 'invisible' : ''}`}></span>
                 </button>
             </div>
 
@@ -156,11 +161,14 @@ export default function AsideComponent({ fullscreen, active, onSelect, switchToC
                             friends={allContacts}
                             selectChat={selectedChat}
                             clearSelection={clearSelection}
-                            onClearedSelection={onClearedSelection} />
+                            onClearedSelection={onClearedSelection}
+                        />
                     </div>
                 ) : (
                     <div className="friends-component">
-                        <FriendsComponent onSelectFriend={onSelect} />
+                        <FriendsComponent
+                            onSelectFriend={onSelect}
+                        />
                     </div>
                 )}
             </div>

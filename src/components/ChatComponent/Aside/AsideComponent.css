@@ -64,6 +64,7 @@ aside {
 }
 
 .tab {
+    position: relative;
     flex: 1;
     padding: 15px;
     text-align: center;
@@ -76,7 +77,20 @@ aside {
     border-top-left-radius: 0.6rem;
     border-top-right-radius: 0.6rem;
     font-weight: 600;
+    display: flex;
+    justify-content: center;
 
+}
+
+.notification-circle {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--unread-timestamp);
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    transition: all 0.2s;
 }
 
 .tab.active:nth-of-type(odd) {
@@ -307,13 +321,13 @@ aside {
     pointer-events: all;
 }
 
-.chat-meta__meta .popup{
+.chat-meta__meta .popup {
     position: absolute;
     top: 3px;
     left: inherit;
     right: calc(0% + 30px);
     background-color: #1b1e22;
-    padding: 3px 3px 5px 3px ;
+    padding: 3px 3px 5px 3px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -386,7 +400,7 @@ aside {
     justify-content: flex-end;
 }
 
-.chat-meta__meta__sub__unread{
+.chat-meta__meta__sub__unread {
     flex: none;
     max-width: 100%;
     font-size: 12px;
@@ -396,7 +410,7 @@ aside {
     display: block;
 }
 
-.chat-meta__meta__sub__unread-badge{
+.chat-meta__meta__sub__unread-badge {
     text-align: center;
     background-color: var(--unread-timestamp);
     padding: 0.3em 0.4em;
@@ -412,7 +426,7 @@ aside {
     color: #111b21;
 }
 
-.unread{
+.unread {
     color: var(--unread-timestamp);
     font-weight: 800;
 }
@@ -484,7 +498,7 @@ aside {
     min-width: 75px;
     padding: 10px 0;
     /* transform: translateX(-110%) translateY(-25%); */
-    transform:  translateX(-55%);
+    transform: translateX(-55%);
     opacity: 1;
     transition: all 0.1s;
     border: 1px solid antiquewhite;
@@ -519,16 +533,17 @@ aside {
     cursor: pointer;
 
 }
-.connection-indicator-container{
+
+.connection-indicator-container {
     display: flex;
     text-overflow: ellipsis;
     max-width: 200px;
     gap: 10px;
     align-items: center;
-    vertical-align:middle;
+    vertical-align: middle;
 }
 
-.connection-indicator{
+.connection-indicator {
     height: 10px;
     width: 10px;
     border-radius: 50%;
@@ -539,21 +554,23 @@ aside {
     min-width: 10px;
 }
 
-.connection-indicator:hover{
+.connection-indicator:hover {
     cursor: pointer;
 }
 
-.connection-indicator.retrying{
+.connection-indicator.retrying {
     background-color: darkorange;
 }
-.connection-indicator.disconnected{
+
+.connection-indicator.disconnected {
     background-color: brown;
 }
-.connection-indicator.connected{
+
+.connection-indicator.connected {
     background-color: rgb(44, 165, 42);
 }
 
-.connection-indicator.connected:hover{
+.connection-indicator.connected:hover {
     cursor: default;
     pointer-events: none;
 }
@@ -565,7 +582,7 @@ aside {
     }
 
     .message-list-container {
-        max-width: none;        
+        max-width: none;
     }
 }
 
